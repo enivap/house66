@@ -58,142 +58,134 @@
   </div>
 </div>
 
-<script>
-const API = "https://script.google.com/macros/s/AKfycbyOJmpwWgfFuar861wPsKLSjAdeIiqnv1DH6r-XlQJhnJeJ6GqUhIue-7soPS8neItt/exec";
+const SHEET_ID = "ใส่_SHEET_ID_ตรงนี้"; // 🔥 ใส่แค่ ID
 
-let USER = null;
-let USERS = {};
+function doGet(e){
+  const action = e.parameter.action;
 
-// INIT
-window.onload = loadUsers;
+  if(action === "getUsers"){
+    return getUsers();
+  }
 
-async function loadUsers(){
-  const res = await fetch(API+"?action=getUsers");
-  const data = await res.json();
+  if(action === "getDebts"){
+    return getDebts(e.parameter.user_id);
+  }
 
-  let html = "";
-  let select = "";
-  let checkbox = "";
-
-  data.forEach(u=>{
-    USERS[u.id] = u.name;
-
-    html += `<button onclick="selectUser(${u.id})" class="bg-blue-600 p-6 rounded-xl">${u.name}</button>`;
-    select += `<option value="${u.id}">${u.name}</option>`;
-    checkbox += `<label class="block"><input type="checkbox" value="${u.id}"> ${u.name}</label>`;
-  });
-
-  document.getElementById('userList').innerHTML = html;
-  document.getElementById('to_user').innerHTML = select;
-  document.getElementById('checkboxUsers').innerHTML = checkbox;
+  return ContentService.createTextOutput("INVALID");
 }
 
-function selectUser(id){
-  USER = id;
-  document.getElementById('loginPage').classList.add('hidden');
-  document.getElementById('dashboard').classList.remove('hidden');
-  document.getElementById('username').innerText = '👤 '+USERS[id];
-  loadData();
+function doPost(e){
+  const data = JSON.parse(e.postData.contents);
+
+  if(data.action === "addDebt"){
+    return addDebt(data);
+  }
+
+  if(data.action === "splitBill"){
+    return splitBill(data);
+  }
+
+  if(data.action === "payDebt"){
+    return payDebt(data);
+  }
+
+  return ContentService.createTextOutput("POST INVALID");
 }
 
-function logout(){
-  location.reload();
+// ================= USERS =================
+function getUsers(){
+  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName("users");
+  const rows = sheet.getDataRange().getValues();
+
+  let result = [];
+  for(let i=1;i<rows.length;i++){
+    result.push({
+      id: rows[i][0],
+      name: rows[i][1]
+    });
+  }
+
+  return json(result);
 }
 
-async function loadData(){
-  const res = await fetch(API+"?action=getDebts&user_id="+USER);
-  const data = await res.json();
+// ================= DEBTS =================
+function getDebts(user_id){
+  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName("debts");
+  const rows = sheet.getDataRange().getValues();
 
-  let totalOwe = 0;
-  let totalOwed = 0;
-  let html = "";
-
-  data.forEach(d=>{
-    let text="";
-
-    if(d.from_user == USER){
-      totalOwe += Number(d.amount);
-      text = `เราติด ${USERS[d.to_user]}`;
-    } else {
-      totalOwed += Number(d.amount);
-      text = `${USERS[d.from_user]} ติดเรา`;
+  let result = [];
+  for(let i=1;i<rows.length;i++){
+    if(rows[i][1]==user_id || rows[i][2]==user_id){
+      result.push({
+        id: rows[i][0],
+        from_user: rows[i][1],
+        to_user: rows[i][2],
+        amount: rows[i][3],
+        title: rows[i][4],
+        status: rows[i][5]
+      });
     }
+  }
 
-    html += `
-    <div class="bg-gray-800 p-4 rounded mb-2">
-      <div class="font-bold">${d.title}</div>
-      <div>${text}</div>
-      <div>${d.amount} บาท</div>
-      <div>${d.status}</div>
-      ${d.status==='pending' && d.from_user==USER ? `
-        <button onclick="pay(${d.id})" class="bg-green-500 px-2 py-1 mt-2">ชำระ</button>
-      `:''}
-    </div>`;
-  });
-
-  document.getElementById('totalOwe').innerText = totalOwe;
-  document.getElementById('totalOwed').innerText = totalOwed;
-  document.getElementById('list').innerHTML = html;
+  return json(result);
 }
 
-async function addDebt(){
-  const amount = document.getElementById('amount').value;
-  if(!amount || amount<=0) return alert('ใส่เงินให้ถูก');
+// ================= ADD =================
+function addDebt(data){
+  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName("debts");
 
-  await fetch(API,{
-    method:'POST',
-    body: JSON.stringify({
-      action:'addDebt',
-      from_user: USER,
-      to_user: document.getElementById('to_user').value,
-      amount: amount,
-      title: document.getElementById('title').value
-    })
-  });
+  sheet.appendRow([
+    new Date().getTime(),
+    data.from_user,
+    data.to_user,
+    data.amount,
+    data.title,
+    "pending"
+  ]);
 
-  loadData();
+  return json({status:"ok"});
 }
 
-async function splitBill(){
-  const total = Number(document.getElementById('bill_amount').value);
-  const title = document.getElementById('bill_title').value;
+// ================= SPLIT =================
+function splitBill(data){
+  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName("debts");
 
-  let people = [];
-  document.querySelectorAll('#checkboxUsers input:checked').forEach(c=>{
-    if(c.value != USER) people.push(c.value);
+  const each = data.total / data.people.length;
+
+  data.people.forEach(p=>{
+    sheet.appendRow([
+      new Date().getTime(),
+      p,
+      data.from_user,
+      each,
+      data.title,
+      "pending"
+    ]);
   });
 
-  if(people.length===0) return alert('เลือกคน');
-
-  await fetch(API,{
-    method:'POST',
-    body: JSON.stringify({
-      action:'splitBill',
-      from_user: USER,
-      total: total,
-      people: people,
-      title: title
-    })
-  });
-
-  loadData();
+  return json({status:"ok"});
 }
 
-async function pay(id){
-  const method = prompt('cash หรือ slip');
+// ================= PAY =================
+function payDebt(data){
+  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName("debts");
+  const rows = sheet.getDataRange().getValues();
 
-  await fetch(API,{
-    method:'POST',
-    body: JSON.stringify({
-      action:'payDebt',
-      id:id,
-      method:method
-    })
-  });
+  for(let i=1;i<rows.length;i++){
+    if(rows[i][0]==data.id){
+      sheet.getRange(i+1,6).setValue("paid");
+    }
+  }
 
-  loadData();
+  return json({status:"ok"});
 }
-</script>
+
+// ================= UTIL =================
+function json(data){
+  return ContentService
+    .createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
 
 </body>
 </html>
