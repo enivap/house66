@@ -2,190 +2,1166 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Debt Startup App</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>หนี้สิน 💸</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;900&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0a0f; --surface:#12121a; --surface2:#1a1a26;
+    --border:rgba(255,255,255,0.08); --text:#f0f0ff;
+    --text-muted:rgba(240,240,255,0.45); --accent:#7c6aff;
+    --green:#2affa8; --red:#ff5a7a; --yellow:#ffd060;
+    --radius:20px; --radius-sm:12px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;overflow:hidden;}
+  body{font-family:'Kanit',sans-serif;background:var(--bg);color:var(--text);display:flex;justify-content:center;align-items:center;}
+  #app{width:100%;max-width:430px;height:100dvh;overflow:hidden;position:relative;background:var(--bg);}
+  .screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;transform:translateY(20px);padding-bottom:40px;}
+  .screen.active{opacity:1;pointer-events:all;transform:translateY(0);}
+  .screen::-webkit-scrollbar{width:3px;}
+  .screen::-webkit-scrollbar-thumb{background:var(--accent);border-radius:10px;}
+
+  /* SETUP */
+  #screen-setup{padding:40px 24px;display:flex;flex-direction:column;}
+  .setup-logo{font-size:3rem;text-align:center;margin-bottom:12px;}
+  .setup-title{font-size:1.8rem;font-weight:900;text-align:center;margin-bottom:6px;}
+  .setup-sub{font-size:.85rem;color:var(--text-muted);text-align:center;margin-bottom:28px;line-height:1.6;}
+  .setup-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px;}
+  .setup-card h3{font-size:.8rem;font-weight:700;margin-bottom:12px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;}
+  .setup-step{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
+  .step-num{width:20px;height:20px;border-radius:50%;background:var(--accent);font-size:.65rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+  .step-text{font-size:.8rem;color:var(--text-muted);line-height:1.6;}
+  .step-text b{color:var(--text);}
+  .script-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;font-size:.7rem;color:var(--yellow);font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:100px;overflow-y:auto;margin-bottom:10px;}
+
+  /* SELECT */
+  #screen-select{display:flex;flex-direction:column;padding:0;}
+  .select-header{padding:58px 26px 22px;position:relative;overflow:hidden;}
+  .select-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -20%,rgba(124,106,255,.3) 0%,transparent 70%);pointer-events:none;}
+  .select-header h1{font-size:2.2rem;font-weight:900;letter-spacing:-.5px;line-height:1.1;}
+  .select-header h1 span{color:var(--accent);}
+  .select-header p{color:var(--text-muted);font-size:.88rem;margin-top:5px;}
+  .sync-status{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:.72rem;padding:4px 12px;border-radius:50px;border:1px solid var(--border);background:rgba(255,255,255,.04);cursor:pointer;}
+  .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--text-muted);}
+  .sync-dot.ok{background:var(--green);} .sync-dot.err{background:var(--red);}
+  .user-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 18px 14px;}
+  .user-card{position:relative;border-radius:24px;overflow:hidden;cursor:pointer;aspect-ratio:.85;border:1px solid var(--border);transition:transform .2s;background:var(--surface);}
+  .user-card:active{transform:scale(.96);}
+  .user-card-bg{position:absolute;inset:0;opacity:.55;}
+  .user-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 40%,transparent);}
+  .user-card-content{position:absolute;bottom:0;left:0;right:0;padding:16px 14px;}
+  .user-avatar-circle{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:8px;border:2px solid rgba(255,255,255,.3);}
+  .user-card-name{font-size:1.25rem;font-weight:700;}
+  .user-card-sub{font-size:.75rem;color:rgba(255,255,255,.6);margin-top:2px;}
+  .user-card-badge{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:4px 10px;font-size:.7rem;font-weight:600;}
+  .badge-red{color:var(--red);} .badge-green{color:var(--green);}
+  .theme-pp .user-card-bg{background:linear-gradient(135deg,#6a3de8,#c83dff,#ff6aae);}
+  .theme-ern .user-card-bg{background:linear-gradient(135deg,#1a6ec7,#00c6ff);}
+  .theme-kung .user-card-bg{background:linear-gradient(135deg,#2d7d46,#5aff8a);}
+  .theme-ice .user-card-bg{background:linear-gradient(135deg,#b05aff,#6ad3ff);}
+  .bottom-actions{padding:0 18px 10px;display:flex;gap:10px;}
+
+  /* DASHBOARD */
+  #screen-dashboard{padding:0;}
+  .dash-header{padding:50px 22px 22px;position:relative;overflow:hidden;}
+  .dash-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 0%,rgba(124,106,255,.25) 0%,transparent 65%);pointer-events:none;}
+  .back-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:50px;padding:6px 14px 6px 10px;font-size:.8rem;cursor:pointer;margin-bottom:18px;color:var(--text);}
+  .back-btn:active{background:rgba(255,255,255,.14);}
+  .dash-profile{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+  .dash-avatar{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;border:3px solid rgba(255,255,255,.2);position:relative;cursor:pointer;}
+  .dash-avatar .edit-icon{position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.65rem;border:2px solid var(--bg);}
+  .dash-name{font-size:1.5rem;font-weight:800;}
+  .stats-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 18px 18px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 16px;position:relative;overflow:hidden;}
+  .stat-card::before{content:'';position:absolute;inset:0;opacity:.07;}
+  .stat-card.debt-card::before{background:var(--red);} .stat-card.credit-card::before{background:var(--green);}
+  .stat-label{font-size:.72rem;color:var(--text-muted);font-weight:500;letter-spacing:.5px;text-transform:uppercase;}
+  .stat-amount{font-size:1.45rem;font-weight:800;margin-top:6px;}
+  .stat-amount.red{color:var(--red);} .stat-amount.green{color:var(--green);}
+  .stat-icon{font-size:1.6rem;margin-bottom:8px;}
+  .section-header{display:flex;align-items:center;justify-content:space-between;padding:0 18px;margin-bottom:10px;}
+  .section-title{font-size:.78rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);}
+  .section-add-btn{background:rgba(124,106,255,.15);border:1px solid rgba(124,106,255,.3);color:var(--accent);border-radius:50px;padding:5px 12px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'Kanit',sans-serif;}
+  .debt-list{padding:0 16px;}
+  .debt-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px;cursor:pointer;transition:transform .15s;display:flex;align-items:center;gap:14px;}
+  .debt-item:active{transform:scale(.98);}
+  .debt-item.debt-type{border-left:3px solid var(--red);} .debt-item.credit-type{border-left:3px solid var(--green);}
+  .debt-person-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+  .debt-info{flex:1;}
+  .debt-person-name{font-size:1rem;font-weight:600;}
+  .debt-desc{font-size:.75rem;color:var(--text-muted);margin-top:2px;}
+  .debt-amount{font-size:1.05rem;font-weight:700;}
+  .debt-amount.red{color:var(--red);} .debt-amount.green{color:var(--green);}
+  .section-separator{margin:20px 22px 14px;border:none;border-top:1px solid var(--border);}
+  .net-badge{display:inline-flex;align-items:center;gap:5px;border-radius:50px;padding:5px 14px;font-size:.82rem;font-weight:600;margin-top:5px;}
+  .net-badge.owe{background:rgba(255,90,122,.12);color:var(--red);border:1px solid rgba(255,90,122,.25);}
+  .net-badge.owed{background:rgba(42,255,168,.1);color:var(--green);border:1px solid rgba(42,255,168,.2);}
+  .net-badge.clear{background:rgba(255,255,255,.06);color:var(--text-muted);border:1px solid var(--border);}
+
+  /* DETAIL */
+  #screen-detail{padding:0;}
+  .detail-header{padding:50px 22px 26px;border-bottom:1px solid var(--border);text-align:center;position:relative;overflow:hidden;}
+  .detail-avatar-wrap{width:80px;height:80px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;border:3px solid rgba(255,255,255,.2);position:relative;z-index:1;}
+  .detail-name{font-size:1.5rem;font-weight:800;position:relative;z-index:1;}
+  .detail-amount-big{font-size:2.4rem;font-weight:900;margin:8px 0 4px;letter-spacing:-1px;position:relative;z-index:1;}
+  .detail-amount-big.red{color:var(--red);} .detail-amount-big.green{color:var(--green);}
+  .detail-direction{font-size:.8rem;color:var(--text-muted);position:relative;z-index:1;}
+  .action-btns{display:flex;gap:10px;padding:16px 16px 0;}
+  .history-list{padding:0 16px;}
+  .history-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;}
+  .history-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;margin-top:2px;}
+  .history-icon.pay{background:rgba(42,255,168,.12);} .history-icon.add{background:rgba(255,90,122,.12);} .history-icon.split{background:rgba(255,208,96,.12);}
+  .history-info{flex:1;}
+  .history-note{font-size:.9rem;font-weight:500;}
+  .history-date{font-size:.72rem;color:var(--text-muted);margin-top:3px;}
+  .history-amount{font-size:1rem;font-weight:700;white-space:nowrap;}
+  .history-amount.pay{color:var(--green);} .history-amount.add{color:var(--red);}
+
+  /* SPLIT */
+  #screen-split{padding:0;}
+  .split-header{padding:50px 22px 24px;background:linear-gradient(135deg,rgba(255,208,96,.1),transparent 60%);border-bottom:1px solid var(--border);}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:var(--surface);border-radius:28px 28px 0 0;width:100%;max-width:430px;padding:22px 22px 40px;transform:translateY(100%);transition:transform .35s cubic-bezier(.22,.68,0,1.2);border:1px solid var(--border);border-bottom:none;max-height:90dvh;overflow-y:auto;}
+  .modal-overlay.open .modal{transform:translateY(0);}
+  .modal-handle{width:40px;height:4px;border-radius:4px;background:rgba(255,255,255,.2);margin:0 auto 18px;}
+  .modal-title{font-size:1.2rem;font-weight:700;margin-bottom:18px;}
+  .form-group{margin-bottom:14px;}
+  .form-label{font-size:.75rem;color:var(--text-muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px;display:block;}
+  .form-input{width:100%;padding:13px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'Kanit',sans-serif;font-size:1rem;outline:none;transition:border-color .2s;}
+  .form-input:focus{border-color:var(--accent);}
+  .form-input::placeholder{color:var(--text-muted);}
+  .toggle-group{display:flex;gap:8px;}
+  .toggle-btn{flex:1;padding:12px;border-radius:var(--radius-sm);background:var(--bg);border:1px solid var(--border);color:var(--text-muted);font-family:'Kanit',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;}
+  .toggle-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .checkbox-list{display:flex;flex-direction:column;gap:8px;}
+  .checkbox-item{display:flex;align-items:center;gap:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;cursor:pointer;transition:border-color .2s;}
+  .checkbox-item.selected{border-color:var(--accent);background:rgba(124,106,255,.08);}
+  .checkbox-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .2s;flex-shrink:0;}
+  .checkbox-item.selected .checkbox-box{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .checkbox-name{font-size:.95rem;font-weight:500;} .checkbox-avatar{font-size:1.2rem;}
+  .btn{flex:1;padding:14px 10px;border:none;border-radius:var(--radius-sm);font-family:'Kanit',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:transform .15s,opacity .15s;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .btn:active{transform:scale(.96);opacity:.85;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-secondary{background:var(--surface2);border:1px solid var(--border);color:var(--text);}
+  .btn-danger{background:rgba(255,90,122,.15);border:1px solid rgba(255,90,122,.3);color:var(--red);}
+  .btn-success{background:rgba(42,255,168,.12);border:1px solid rgba(42,255,168,.3);color:var(--green);}
+  .btn-full{width:100%;border-radius:var(--radius-sm);}
+  .emoji-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:8px;}
+  .emoji-opt{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:1.5rem;border-radius:10px;cursor:pointer;border:2px solid transparent;background:var(--bg);transition:all .15s;}
+  .emoji-opt.selected{border-color:var(--accent);background:rgba(124,106,255,.15);}
+  .info-box{background:rgba(124,106,255,.08);border:1px solid rgba(124,106,255,.2);border-radius:var(--radius-sm);padding:12px;font-size:.82rem;color:var(--text-muted);line-height:1.7;margin-bottom:14px;}
+  .info-box b{color:var(--accent);}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  .fade-up{animation:fadeUp .4s ease both;}
+  .fade-up-1{animation-delay:.05s;} .fade-up-2{animation-delay:.12s;} .fade-up-3{animation-delay:.19s;} .fade-up-4{animation-delay:.26s;} .fade-up-5{animation-delay:.33s;}
+  .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border);border-radius:50px;padding:10px 20px;font-size:.88rem;font-weight:500;transition:transform .35s cubic-bezier(.22,.68,0,1.2),opacity .35s;opacity:0;z-index:999;white-space:nowrap;backdrop-filter:blur(10px);}
+  .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+  /* USER MANAGEMENT (setup screen) */
+  .user-manage-row{display:flex;align-items:center;gap:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;}
+  .user-manage-avatar{font-size:1.4rem;flex-shrink:0;width:36px;text-align:center;}
+  .user-manage-info{flex:1;}
+  .user-manage-name{font-size:.95rem;font-weight:600;}
+  .user-manage-sub{font-size:.72rem;color:var(--text-muted);margin-top:2px;}
+  .user-manage-del{background:rgba(255,90,122,.12);border:1px solid rgba(255,90,122,.3);color:var(--red);border-radius:8px;padding:6px 12px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'Kanit',sans-serif;flex-shrink:0;}
+  .user-manage-del:active{opacity:.7;}
+  .color-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:8px;}
+  .color-dot{width:32px;height:32px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform .15s;}
+  .color-dot.selected{border-color:#fff;transform:scale(1.15);}
+  .color-dot:active{transform:scale(.9);}
+
+  /* ACTIVITY LOG */
+  .log-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;margin-bottom:8px;display:flex;align-items:flex-start;gap:11px;}
+  .log-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;margin-top:1px;}
+  .log-icon.pay{background:rgba(42,255,168,.12);}
+  .log-icon.add{background:rgba(255,90,122,.12);}
+  .log-icon.split{background:rgba(255,208,96,.12);}
+  .log-icon.user-add{background:rgba(124,106,255,.12);}
+  .log-icon.user-del{background:rgba(255,90,122,.08);}
+  .log-info{flex:1;}
+  .log-note{font-size:.88rem;font-weight:500;line-height:1.4;}
+  .log-date{font-size:.7rem;color:var(--text-muted);margin-top:3px;}
+  .log-amount{font-size:.95rem;font-weight:700;white-space:nowrap;}
+  .log-amount.pay{color:var(--green);} .log-amount.add{color:var(--red);}
+  .log-amount.neutral{color:var(--text-muted);}
+</style>
 </head>
+<body>
+<div id="app">
 
-<body class="bg-gradient-to-br from-gray-950 to-gray-900 text-white p-6">
+<!-- SETUP -->
+<div id="screen-setup" class="screen">
+  <div class="setup-logo">🔧</div>
+  <div class="setup-title">ตั้งค่า Sync</div>
+  <div class="setup-sub">เชื่อมต่อ Google Sheets เพื่อแชร์ข้อมูลทุกคน<br>ข้ามได้ถ้าอยากใช้แบบ Offline ก่อน</div>
+  <div class="setup-card">
+    <h3>📋 Apps Script Code</h3>
+    <div class="script-box" id="script-code-box"></div>
+    <button class="btn btn-secondary btn-full" onclick="copyScript()" style="margin-bottom:0;font-size:.85rem;">📋 คัดลอกโค้ด</button>
+  </div>
+  <div class="setup-card">
+    <h3>🚀 วิธี Deploy</h3>
+    <div class="setup-step"><div class="step-num">1</div><div class="step-text">เปิด Google Sheets ใหม่ → <b>Extensions → Apps Script</b></div></div>
+    <div class="setup-step"><div class="step-num">2</div><div class="step-text">ลบโค้ดเดิม วางโค้ดด้านบน กด <b>Save</b></div></div>
+    <div class="setup-step"><div class="step-num">3</div><div class="step-text"><b>Deploy → New deployment → Web app</b><br>Execute as: <b>Me</b> · Access: <b>Anyone</b></div></div>
+    <div class="setup-step"><div class="step-num">4</div><div class="step-text">คัดลอก <b>Deployment URL</b> มาวางด้านล่าง</div></div>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Deployment URL</label>
+    <input class="form-input" id="setup-url" placeholder="https://script.google.com/macros/s/..." style="font-size:.78rem;">
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:20px;">
+    <button class="btn btn-secondary" onclick="skipSetup()">ข้ามก่อน</button>
+    <button class="btn btn-primary" onclick="saveSetup()">🔗 เชื่อมต่อ</button>
+  </div>
 
-<!-- LOGIN -->
-<div id="loginPage">
-  <h1 class="text-3xl font-bold mb-6">เลือกผู้ใช้งาน</h1>
-  <div id="userList" class="grid grid-cols-2 gap-4"></div>
+  <!-- USER MANAGEMENT -->
+  <div class="setup-card">
+    <h3>👥 จัดการผู้ใช้</h3>
+    <div id="setup-user-list"></div>
+    <button class="btn btn-primary btn-full" style="margin-top:4px;font-size:.85rem;" onclick="openAddUserModal()">+ เพิ่มคนใหม่</button>
+  </div>
+
+  <!-- ACTIVITY LOG -->
+  <div class="setup-card">
+    <h3>📋 Log กิจกรรมทั้งหมด</h3>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+      <button class="toggle-btn active" style="flex:0 0 auto;padding:6px 12px;font-size:.75rem;" id="log-filter-all" onclick="filterLog('all')">ทั้งหมด</button>
+      <button class="toggle-btn" style="flex:0 0 auto;padding:6px 12px;font-size:.75rem;" id="log-filter-pay" onclick="filterLog('pay')">💸 จ่าย</button>
+      <button class="toggle-btn" style="flex:0 0 auto;padding:6px 12px;font-size:.75rem;" id="log-filter-add" onclick="filterLog('add')">➕ เพิ่มหนี้</button>
+      <button class="toggle-btn" style="flex:0 0 auto;padding:6px 12px;font-size:.75rem;" id="log-filter-split" onclick="filterLog('split')">🍻 หาร</button>
+    </div>
+    <div id="activity-log-list"></div>
+  </div>
+
+  <div style="padding-bottom:10px;">
+    <button class="btn btn-secondary btn-full" onclick="showScreen('screen-select');renderSelect();">← กลับหน้าหลัก</button>
+  </div>
+</div>
+
+<!-- SELECT -->
+<div id="screen-select" class="screen">
+  <div class="select-header">
+    <h1>หนี้<span>สิน</span><br>ของเรา 💸</h1>
+    <p>เลือกโปรไฟล์เพื่อดูรายการ</p>
+    <div class="sync-status" id="sync-status" onclick="manualSync()">
+      <div class="sync-dot" id="sync-dot"></div>
+      <span id="sync-label">ไม่ได้เชื่อมต่อ</span>
+    </div>
+  </div>
+  <div class="user-grid" id="user-grid"></div>
+  <div class="bottom-actions">
+    <button class="btn btn-secondary" style="border-radius:var(--radius);padding:14px;" onclick="openSplit(false)">🍻 หารบิล</button>
+    <button class="btn btn-secondary" style="border-radius:var(--radius);padding:14px;flex:0 0 auto;" onclick="showScreen('screen-setup')">⚙️</button>
+  </div>
 </div>
 
 <!-- DASHBOARD -->
-<div id="dashboard" class="hidden">
-  <div class="flex justify-between items-center mb-4">
-    <h1 id="username" class="text-2xl"></h1>
-    <button onclick="logout()" class="bg-red-500 px-3 py-1 rounded">ออก</button>
-  </div>
-
-  <!-- SUMMARY -->
-  <div class="grid grid-cols-2 gap-4 mb-6">
-    <div class="bg-red-500/20 p-4 rounded-xl backdrop-blur">
-      <div>💸 เราเป็นหนี้</div>
-      <div id="totalOwe" class="text-2xl font-bold">0</div>
-    </div>
-    <div class="bg-green-500/20 p-4 rounded-xl backdrop-blur">
-      <div>💰 คนติดเรา</div>
-      <div id="totalOwed" class="text-2xl font-bold">0</div>
+<div id="screen-dashboard" class="screen">
+  <div class="dash-header">
+    <button class="back-btn" onclick="showScreen('screen-select');renderSelect();">← กลับ</button>
+    <div class="dash-profile">
+      <div class="dash-avatar" onclick="openEditProfile()">
+        <span id="dash-avatar-emoji">🙂</span>
+        <span class="edit-icon">✏️</span>
+      </div>
+      <div>
+        <div class="dash-name" id="dash-name">-</div>
+        <div id="dash-net-badge"></div>
+      </div>
     </div>
   </div>
-
-  <!-- LIST -->
-  <div id="list" class="mb-6"></div>
-
-  <!-- ADD DEBT -->
-  <div class="bg-white/10 p-4 rounded-xl mb-4">
-    <h2 class="mb-2">➕ เพิ่มคนที่เป็นหนี้เรา</h2>
-    <input id="title" placeholder="รายการ" class="w-full mb-2 p-2 text-black">
-    <select id="to_user" class="w-full mb-2 p-2 text-black"></select>
-    <input id="amount" type="number" placeholder="จำนวนเงิน" class="w-full mb-2 p-2 text-black">
-    <button onclick="addDebt()" class="bg-blue-500 px-4 py-2 rounded">เพิ่ม</button>
+  <div class="stats-row fade-up fade-up-1">
+    <div class="stat-card debt-card">
+      <div class="stat-icon">😰</div>
+      <div class="stat-label">ฉันเป็นหนี้</div>
+      <div class="stat-amount red" id="stat-owe">฿0</div>
+    </div>
+    <div class="stat-card credit-card">
+      <div class="stat-icon">🤑</div>
+      <div class="stat-label">ฉันมีลูกหนี้</div>
+      <div class="stat-amount green" id="stat-owed">฿0</div>
+    </div>
   </div>
-
-  <!-- SPLIT BILL -->
-  <div class="bg-white/10 p-4 rounded-xl">
-    <h2 class="mb-2">🍜 หารบิล</h2>
-    <input id="bill_title" placeholder="ชื่อบิล" class="w-full mb-2 p-2 text-black">
-    <input id="bill_amount" type="number" placeholder="ยอดรวม" class="w-full mb-2 p-2 text-black">
-
-    <div id="checkboxUsers" class="mb-2"></div>
-
-    <button onclick="splitBill()" class="bg-purple-500 px-4 py-2 rounded">หาร</button>
+  <div class="section-header fade-up fade-up-2">
+    <div class="section-title">😰 ฉันเป็นหนี้ใคร</div>
+  </div>
+  <div class="debt-list fade-up fade-up-3" id="list-i-owe"></div>
+  <hr class="section-separator">
+  <div class="section-header fade-up fade-up-4">
+    <div class="section-title">🤑 ใครเป็นหนี้ฉัน</div>
+    <button class="section-add-btn" onclick="openAddDebtorModal()">+ เพิ่มลูกหนี้</button>
+  </div>
+  <div class="debt-list fade-up fade-up-5" id="list-owe-me"></div>
+  <div style="padding:14px 16px 0;">
+    <button class="btn btn-secondary btn-full" onclick="openSplit(true)">🍻 หารบิล</button>
   </div>
 </div>
 
-const SHEET_ID = "1pq0u9QqiHSoUYcZjZoCZOTtLsCS1CmLfGrrG00PDeJg"; // 🔥 
+<!-- DETAIL -->
+<div id="screen-detail" class="screen">
+  <div class="detail-header" id="detail-header">
+    <button class="back-btn" onclick="showScreen('screen-dashboard');renderDash();" style="position:relative;z-index:2;">← กลับ</button>
+    <div class="detail-avatar-wrap" id="detail-avatar">🙂</div>
+    <div class="detail-name" id="detail-name">-</div>
+    <div class="detail-amount-big" id="detail-amount">฿0</div>
+    <div class="detail-direction" id="detail-direction">-</div>
+  </div>
+  <div class="action-btns" id="detail-actions"></div>
+  <div style="padding:18px 0 10px 22px;" class="section-title">ประวัติรายการ</div>
+  <div class="history-list" id="detail-history"></div>
+</div>
 
-function doGet(e){
-  const action = e.parameter.action;
+<!-- SPLIT -->
+<div id="screen-split" class="screen">
+  <div class="split-header">
+    <button class="back-btn" id="split-back-btn">← กลับ</button>
+    <div style="font-size:2rem;margin-bottom:8px;">🍻</div>
+    <h2 style="font-size:1.5rem;font-weight:800;">หารบิล</h2>
+    <p style="color:var(--text-muted);font-size:.85rem;margin-top:4px;">ใส่ยอดบิลและเลือกคนที่ร่วมหาร</p>
+  </div>
+  <div style="padding:20px 16px 0;">
+    <div class="form-group">
+      <label class="form-label">ชื่อรายการ (ไม่บังคับ)</label>
+      <input class="form-input" id="split-note" placeholder="เช่น ดื่มที่ริมน้ำ...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">ยอดบิลทั้งหมด (บาท)</label>
+      <input class="form-input" id="split-total" type="number" placeholder="0" inputmode="decimal" oninput="updateSplitPreview()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">ผู้จ่าย (คนที่ออกเงินไป)</label>
+      <div class="checkbox-list" id="split-payer-list"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">คนที่ร่วมหาร (รวมผู้จ่ายด้วยถ้าร่วมด้วย)</label>
+      <div class="checkbox-list" id="split-people-list"></div>
+    </div>
+    <div id="split-preview" style="margin-bottom:20px;padding:16px;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border);display:none;">
+      <div style="font-weight:600;margin-bottom:8px;">ตัวอย่างผล</div>
+      <div id="split-preview-content" style="font-size:.88rem;color:var(--text-muted);line-height:1.8;"></div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="confirmSplit()">✅ ยืนยันและเพิ่มหนี้</button>
+  </div>
+</div>
 
-  if(action === "getUsers"){
-    return getUsers();
+
+<!-- Add User Modal -->
+<div class="modal-overlay" id="modal-add-user">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">👤 เพิ่มคนใหม่</div>
+    <div class="form-group">
+      <label class="form-label">ชื่อ</label>
+      <input class="form-input" id="new-user-name" placeholder="เช่น มิ้น...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Emoji โปรไฟล์</label>
+      <div class="emoji-grid" id="new-user-emoji-grid"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">สีธีม</label>
+      <div class="color-grid" id="new-user-color-grid"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-user')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="confirmAddUser()">✅ เพิ่ม</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete User Modal -->
+<div class="modal-overlay" id="modal-del-user">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🗑️ ลบผู้ใช้</div>
+    <div class="info-box" id="del-user-info"></div>
+    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:16px;line-height:1.6;">การลบจะลบข้อมูลหนี้และประวัติทุกรายการของคนนี้ด้วย ไม่สามารถกู้คืนได้</p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary" onclick="closeModal('modal-del-user')">ยกเลิก</button>
+      <button class="btn btn-danger" onclick="confirmDelUser()">🗑️ ลบเลย</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-pay">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💸 จ่ายหนี้</div>
+    <div class="info-box" id="pay-info-box"></div>
+    <div class="form-group">
+      <label class="form-label">จำนวนที่จ่าย (บาท)</label>
+      <input class="form-input" id="pay-amount" type="number" placeholder="0" inputmode="decimal">
+    </div>
+    <div class="form-group">
+      <label class="form-label">วิธีจ่าย</label>
+      <div class="toggle-group">
+        <button class="toggle-btn active" id="pay-method-cash" onclick="selectPayMethod('cash')">💵 เงินสด</button>
+        <button class="toggle-btn" id="pay-method-transfer" onclick="selectPayMethod('transfer')">📲 อัพสลีฟ</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">หมายเหตุ (ไม่บังคับ)</label>
+      <input class="form-input" id="pay-note" placeholder="เช่น จ่ายค่ากินข้าว...">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary" onclick="closeModal('modal-pay')">ยกเลิก</button>
+      <button class="btn btn-success" onclick="confirmPay()">✅ ยืนยัน</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-debt">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="add-debt-title">➕ เพิ่มหนี้</div>
+    <div class="form-group">
+      <label class="form-label">จำนวน (บาท)</label>
+      <input class="form-input" id="add-debt-amount" type="number" placeholder="0" inputmode="decimal">
+    </div>
+    <div class="form-group">
+      <label class="form-label">หมายเหตุ</label>
+      <input class="form-input" id="add-debt-note" placeholder="เช่น ค่าอาหาร...">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-debt')">ยกเลิก</button>
+      <button class="btn btn-danger" onclick="confirmAddDebt()">➕ เพิ่ม</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-debtor">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🤑 เพิ่มลูกหนี้</div>
+    <div class="form-group">
+      <label class="form-label">คนที่ติดหนี้คุณ</label>
+      <div class="checkbox-list" id="debtor-person-list"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">จำนวน (บาท)</label>
+      <input class="form-input" id="debtor-amount" type="number" placeholder="0" inputmode="decimal">
+    </div>
+    <div class="form-group">
+      <label class="form-label">หมายเหตุ</label>
+      <input class="form-input" id="debtor-note" placeholder="เช่น ค่าอาหาร...">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-debtor')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="confirmAddDebtor()">✅ เพิ่ม</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-edit-profile">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✏️ แก้ไขโปรไฟล์</div>
+    <div class="form-group">
+      <label class="form-label">ชื่อ</label>
+      <input class="form-input" id="edit-name" placeholder="ชื่อของคุณ">
+    </div>
+    <div class="form-group">
+      <label class="form-label">เลือก Emoji</label>
+      <div class="emoji-grid" id="emoji-grid"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button class="btn btn-secondary" onclick="closeModal('modal-edit-profile')">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveProfile()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Apps Script code template ─────────────────────────────────
+const APPS_SCRIPT_CODE = `const SHEET_NAME = 'DebtDB';
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
+    sheet.clearContents();
+    sheet.getRange(1, 1).setValue(JSON.stringify(data));
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
   }
-
-  if(action === "getDebts"){
-    return getDebts(e.parameter.user_id);
-  }
-
-  return ContentService.createTextOutput("INVALID");
 }
 
-function doPost(e){
-  const data = JSON.parse(e.postData.contents);
-
-  if(data.action === "addDebt"){
-    return addDebt(data);
-  }
-
-  if(data.action === "splitBill"){
-    return splitBill(data);
-  }
-
-  if(data.action === "payDebt"){
-    return payDebt(data);
-  }
-
-  return ContentService.createTextOutput("POST INVALID");
-}
-
-// ================= USERS =================
-function getUsers(){
-  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName("users");
-  const rows = sheet.getDataRange().getValues();
-
-  let result = [];
-  for(let i=1;i<rows.length;i++){
-    result.push({
-      id: rows[i][0],
-      name: rows[i][1]
-    });
-  }
-
-  return json(result);
-}
-
-// ================= DEBTS =================
-function getDebts(user_id){
-  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName("debts");
-  const rows = sheet.getDataRange().getValues();
-
-  let result = [];
-  for(let i=1;i<rows.length;i++){
-    if(rows[i][1]==user_id || rows[i][2]==user_id){
-      result.push({
-        id: rows[i][0],
-        from_user: rows[i][1],
-        to_user: rows[i][2],
-        amount: rows[i][3],
-        title: rows[i][4],
-        status: rows[i][5]
-      });
+function doGet(e) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet || sheet.getLastRow() === 0) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ ok: true, data: null }))
+        .setMimeType(ContentService.MimeType.JSON);
     }
+    const raw = sheet.getRange(1, 1).getValue();
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true, data: JSON.parse(raw) }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+
+document.getElementById('script-code-box').textContent = APPS_SCRIPT_CODE;
+
+function copyScript() {
+  navigator.clipboard.writeText(APPS_SCRIPT_CODE)
+    .then(() => showToast('📋 คัดลอกแล้ว!'))
+    .catch(() => {
+      const r = document.createRange();
+      r.selectNode(document.getElementById('script-code-box'));
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(r);
+      showToast('📋 เลือกข้อความแล้ว — กด Copy');
+    });
+}
+
+// ── State ─────────────────────────────────────────────────────
+const EMOJIS = ['😎','🥶','🤩','😏','🤑','😤','🥳','🙄','😇','🫡','🤓','🥸','😈','👑','🔥','⚡','💫','🌊','🌸','🎸','🍺','🎲','💎','🚀'];
+
+const DEFAULT_DB = {
+  users: {
+    pp:   { id:'pp',   name:'พีพี', emoji:'😎', color:'#c83dff' },
+    ern:  { id:'ern',  name:'เอิน', emoji:'🤩', color:'#00c6ff' },
+    kung: { id:'kung', name:'กุ้ง', emoji:'😏', color:'#5aff8a' },
+    ice:  { id:'ice',  name:'ไอซ์', emoji:'😇', color:'#6ad3ff' },
+  },
+  debts: {
+    ern:  { ice:3390, kung:1280 },
+    pp:   { ice:230,  kung:1700, ern:300 },
+    kung: {},
+    ice:  {},
+  },
+  history: [
+    {id:1,  from:'ern',to:'ice', type:'add',amount:2690,note:'หนี้เก่า',                ts:+new Date('2024-11-01T10:00:00+07:00')},
+    {id:2,  from:'ern',to:'ice', type:'add',amount:700, note:'',                         ts:+new Date('2024-11-10T14:30:00+07:00')},
+    {id:3,  from:'pp', to:'ice', type:'add',amount:400, note:'',                         ts:+new Date('2024-11-02T09:00:00+07:00')},
+    {id:4,  from:'pp', to:'ice', type:'add',amount:130, note:'',                         ts:+new Date('2024-11-05T12:00:00+07:00')},
+    {id:5,  from:'pp', to:'ice', type:'add',amount:200, note:'',                         ts:+new Date('2024-11-08T11:00:00+07:00')},
+    {id:6,  from:'pp', to:'ice', type:'pay',amount:500, note:'จ่ายคืนบางส่วน',method:'cash',ts:+new Date('2024-11-15T16:00:00+07:00')},
+    {id:7,  from:'ern',to:'kung',type:'add',amount:380, note:'',                         ts:+new Date('2024-11-01T10:00:00+07:00')},
+    {id:8,  from:'ern',to:'kung',type:'add',amount:200, note:'',                         ts:+new Date('2024-11-03T13:00:00+07:00')},
+    {id:9,  from:'ern',to:'kung',type:'add',amount:700, note:'',                         ts:+new Date('2024-11-12T15:00:00+07:00')},
+    {id:10, from:'pp', to:'kung',type:'add',amount:1700,note:'',                         ts:+new Date('2024-11-01T10:00:00+07:00')},
+    {id:11, from:'pp', to:'ern', type:'add',amount:300, note:'',                         ts:+new Date('2024-11-07T18:00:00+07:00')},
+  ]
+};
+
+let db = JSON.parse(JSON.stringify(DEFAULT_DB));
+let scriptUrl = '';
+let currentUser = null;
+let currentDetail = null; // { from, to }
+let payMethod = 'cash';
+let selectedEmoji = null;
+let splitPayer = null;
+let splitPeople = [];
+let selectedDebtor = null;
+let splitFromDash = false;
+
+function ls(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } }
+function saveLocal(){ ls('debt_db', JSON.stringify(db)); }
+function loadLocal(){
+  const s = ls('debt_db');
+  if(s){ try{ db = JSON.parse(s); }catch(e){} }
+  scriptUrl = ls('debt_script_url') || '';
+}
+
+// ── Sync ──────────────────────────────────────────────────────
+function setSyncUI(state, label){
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  if(!dot||!lbl) return;
+  dot.className = 'sync-dot' + (state==='ok'?' ok':state==='err'?' err':'');
+  lbl.textContent = label;
+}
+
+async function syncPush(){
+  if(!scriptUrl) return;
+  try {
+    await fetch(scriptUrl, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(db) });
+    setSyncUI('ok','✅ ซิงค์แล้ว');
+  } catch(e){ setSyncUI('err','❌ Push ไม่ได้'); }
+}
+
+async function syncPull(){
+  if(!scriptUrl){ setSyncUI('off','ไม่ได้เชื่อมต่อ'); return; }
+  setSyncUI('','⟳ กำลังดึงข้อมูล...');
+  try {
+    const res = await fetch(scriptUrl + '?t=' + Date.now());
+    const json = await res.json();
+    if(json.ok && json.data){ db = json.data; saveLocal(); renderSelect(); setSyncUI('ok','✅ ดึงข้อมูลแล้ว'); }
+    else setSyncUI('ok','✅ เชื่อมต่อแล้ว');
+  } catch(e){ setSyncUI('err','⚠️ ดึงข้อมูลไม่ได้'); }
+}
+
+async function manualSync(){
+  if(!scriptUrl){ showToast('⚙️ ตั้งค่า URL ก่อน'); return; }
+  await syncPull();
+  await syncPush();
+}
+
+function saveAndSync(){ saveLocal(); syncPush(); }
+
+// ── Setup ─────────────────────────────────────────────────────
+function saveSetup(){
+  const url = document.getElementById('setup-url').value.trim();
+  if(!url.startsWith('https://script.google.com')){ showToast('⚠️ URL ไม่ถูกต้อง'); return; }
+  scriptUrl = url;
+  ls('debt_script_url', url);
+  showToast('🔗 บันทึก URL แล้ว กำลังทดสอบ...');
+  syncPull().then(()=>{ showScreen('screen-select'); renderSelect(); });
+}
+function skipSetup(){ showScreen('screen-select'); renderSelect(); }
+
+// ── Utils ─────────────────────────────────────────────────────
+function fmt(n){ return '฿' + Math.abs(n).toLocaleString('th-TH'); }
+function thaiDate(ts){ return new Date(ts).toLocaleString('th-TH',{timeZone:'Asia/Bangkok',day:'numeric',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+function showToast(msg, dur=2600){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'), dur);
+}
+function getDebt(f,t){ return (db.debts[f]&&db.debts[f][t]) || 0; }
+function setDebt(f,t,v){ if(!db.debts[f]) db.debts[f]={}; db.debts[f][t]=Math.max(0,v); }
+function addDebtRaw(f,t,d){ setDebt(f,t,getDebt(f,t)+d); }
+function newId(){ return Date.now()*1000 + Math.floor(Math.random()*999); }
+
+// ── Screens ───────────────────────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='screen-setup') renderSetupScreen();
+}
+
+// ── Select Screen ─────────────────────────────────────────────
+const THEMES = {pp:'theme-pp',ern:'theme-ern',kung:'theme-kung',ice:'theme-ice'};
+
+function renderSelect(){
+  const grid = document.getElementById('user-grid');
+  grid.innerHTML = '';
+  setSyncUI(scriptUrl?'ok':'off', scriptUrl?'✅ เชื่อมต่อแล้ว':'ไม่ได้เชื่อมต่อ');
+  Object.values(db.users).forEach((u,i)=>{
+    const owe  = Object.values(db.debts[u.id]||{}).reduce((a,b)=>a+b,0);
+    const owed = Object.keys(db.users).filter(k=>k!==u.id).reduce((a,k)=>a+getDebt(k,u.id),0);
+    const net  = owed - owe;
+    const card = document.createElement('div');
+    card.className = `user-card ${THEMES[u.id]||''} fade-up`;
+    card.style.animationDelay = (i*.08)+'s';
+    card.innerHTML = `
+      <div class="user-card-bg"></div>
+      <div class="user-card-overlay"></div>
+      <div class="user-card-content">
+        <div class="user-avatar-circle">${u.emoji}</div>
+        <div class="user-card-name">${u.name}</div>
+        <div class="user-card-sub">${net>=0?'💰 มีคนติดหนี้':'😰 มีหนี้ค้าง'}</div>
+      </div>
+      <div class="user-card-badge ${net>=0?'badge-green':'badge-red'}">${net>=0?'+':''}${fmt(net)}</div>`;
+    card.onclick = ()=>{ currentUser=u.id; renderDash(); showScreen('screen-dashboard'); };
+    grid.appendChild(card);
+  });
+}
+
+// ── Dashboard ─────────────────────────────────────────────────
+function renderDash(){
+  const u = db.users[currentUser];
+  document.getElementById('dash-avatar-emoji').textContent = u.emoji;
+  document.getElementById('dash-name').textContent = u.name;
+
+  const owe  = Object.values(db.debts[currentUser]||{}).reduce((a,b)=>a+b,0);
+  const owed = Object.keys(db.users).filter(k=>k!==currentUser).reduce((a,k)=>a+getDebt(k,currentUser),0);
+  const net  = owed - owe;
+  document.getElementById('stat-owe').textContent  = fmt(owe);
+  document.getElementById('stat-owed').textContent = fmt(owed);
+  const nb = document.getElementById('dash-net-badge');
+  nb.innerHTML = net>0 ? `<span class="net-badge owed">📈 ได้สุทธิ ${fmt(net)}</span>`
+               : net<0 ? `<span class="net-badge owe">📉 ติดสุทธิ ${fmt(-net)}</span>`
+               : `<span class="net-badge clear">✨ เสมอกัน</span>`;
+
+  // I owe
+  const li = document.getElementById('list-i-owe');
+  li.innerHTML = '';
+  const myDebts = Object.entries(db.debts[currentUser]||{}).filter(([,v])=>v>0);
+  if(!myDebts.length) li.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:.9rem;">🎉 ไม่มีหนี้!</div>`;
+  else myDebts.forEach(([toId,amt])=> li.appendChild(makeDebtItem(toId,amt,'debt',()=>openDetail(currentUser,toId))));
+
+  // Owe me
+  const lm = document.getElementById('list-owe-me');
+  lm.innerHTML = '';
+  const debtors = Object.keys(db.users).filter(k=>k!==currentUser&&getDebt(k,currentUser)>0);
+  if(!debtors.length) lm.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:.9rem;">ยังไม่มีลูกหนี้</div>`;
+  else debtors.forEach(f=> lm.appendChild(makeDebtItem(f,getDebt(f,currentUser),'credit',()=>openDetail(f,currentUser))));
+}
+
+function makeDebtItem(personId,amt,type,onclick){
+  const u = db.users[personId];
+  const d = document.createElement('div');
+  d.className = `debt-item ${type==='debt'?'debt-type':'credit-type'}`;
+  d.innerHTML = `
+    <div class="debt-person-avatar" style="background:${u.color}22;">${u.emoji}</div>
+    <div class="debt-info">
+      <div class="debt-person-name">${u.name}</div>
+      <div class="debt-desc">${type==='debt'?'ฉันเป็นหนี้':'เป็นหนี้ฉัน'}</div>
+    </div>
+    <div class="debt-amount ${type==='debt'?'red':'green'}">${fmt(amt)}</div>
+    <div style="color:var(--text-muted);font-size:.8rem;">›</div>`;
+  d.onclick = onclick;
+  return d;
+}
+
+// ── Add Debtor from Dashboard ─────────────────────────────────
+function openAddDebtorModal(){
+  selectedDebtor = null;
+  document.getElementById('debtor-amount').value = '';
+  document.getElementById('debtor-note').value = '';
+  const list = document.getElementById('debtor-person-list');
+  list.innerHTML = '';
+  Object.values(db.users).filter(u=>u.id!==currentUser).forEach(u=>{
+    const d = document.createElement('div');
+    d.className = 'checkbox-item';
+    d.innerHTML = `<div class="checkbox-box"></div><div class="checkbox-avatar">${u.emoji}</div><div class="checkbox-name">${u.name}</div>`;
+    d.onclick = ()=>{
+      selectedDebtor = u.id;
+      list.querySelectorAll('.checkbox-item').forEach(x=>{ x.classList.remove('selected'); x.querySelector('.checkbox-box').textContent=''; });
+      d.classList.add('selected'); d.querySelector('.checkbox-box').textContent='✓';
+    };
+    list.appendChild(d);
+  });
+  openModal('modal-add-debtor');
+}
+
+function confirmAddDebtor(){
+  if(!selectedDebtor){ showToast('⚠️ เลือกคนก่อน'); return; }
+  const amt = parseFloat(document.getElementById('debtor-amount').value);
+  if(!amt||amt<=0){ showToast('⚠️ ใส่จำนวนเงิน'); return; }
+  const note = document.getElementById('debtor-note').value || 'เพิ่มหนี้';
+  addDebtRaw(selectedDebtor, currentUser, amt);
+  db.history.push({ id:newId(), from:selectedDebtor, to:currentUser, type:'add', amount:amt, note, ts:Date.now() });
+  saveAndSync();
+  closeModal('modal-add-debtor');
+  renderDash();
+  showToast(`✅ เพิ่มหนี้ ${db.users[selectedDebtor].name} แล้ว!`);
+}
+
+// ── Detail ────────────────────────────────────────────────────
+function openDetail(fromId,toId){
+  currentDetail = { from:fromId, to:toId };
+  renderDetail();
+  showScreen('screen-detail');
+}
+
+function renderDetail(){
+  const {from,to} = currentDetail;
+  const fU = db.users[from], tU = db.users[to];
+  const amt = getDebt(from,to);
+  const iAmFrom = from===currentUser;
+
+  document.getElementById('detail-avatar').textContent   = iAmFrom?tU.emoji:fU.emoji;
+  document.getElementById('detail-name').textContent     = iAmFrom?tU.name:fU.name;
+  document.getElementById('detail-amount').textContent   = fmt(amt);
+  document.getElementById('detail-amount').className     = `detail-amount-big ${iAmFrom?'red':'green'}`;
+  document.getElementById('detail-direction').textContent= iAmFrom?`${fU.name} เป็นหนี้ ${tU.name}`:`${fU.name} เป็นหนี้คุณ`;
+  document.getElementById('detail-header').style.background =
+    `linear-gradient(135deg,${(iAmFrom?tU:fU).color}30 0%,transparent 60%)`;
+
+  // Buttons — always show regardless of amt=0
+  const acts = document.getElementById('detail-actions');
+  acts.innerHTML = '';
+  if(iAmFrom){
+    const b = document.createElement('button');
+    b.className = 'btn btn-success';
+    b.innerHTML = '💸 จ่ายหนี้';
+    b.disabled = amt <= 0;
+    b.style.opacity = amt<=0?'0.4':'1';
+    b.onclick = openPayModal;
+    acts.appendChild(b);
+  } else {
+    const b = document.createElement('button');
+    b.className = 'btn btn-danger';
+    b.innerHTML = '➕ เพิ่มหนี้';
+    b.onclick = openAddDebtModal;
+    acts.appendChild(b);
   }
 
-  return json(result);
+  // History
+  const hist = document.getElementById('detail-history');
+  hist.innerHTML = '';
+  const items = db.history.filter(h=>h.from===from&&h.to===to).sort((a,b)=>b.ts-a.ts);
+  if(!items.length){ hist.innerHTML=`<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:.88rem;">ยังไม่มีประวัติ</div>`; return; }
+  items.forEach(h=>{
+    const d = document.createElement('div');
+    d.className = 'history-item';
+    const icon = h.type==='pay'?'💸':h.type==='split'?'🍻':'➕';
+    const cls  = h.type==='pay'?'pay':h.type==='split'?'split':'add';
+    const sign = h.type==='pay'?'-':'+';
+    d.innerHTML = `
+      <div class="history-icon ${cls}">${icon}</div>
+      <div class="history-info">
+        <div class="history-note">${h.note||(h.type==='pay'?'จ่ายหนี้':h.type==='split'?'หารบิล':'เพิ่มหนี้')}</div>
+        <div class="history-date">${thaiDate(h.ts)}${h.method?' · '+(h.method==='transfer'?'📲 อัพสลีฟ':'💵 เงินสด'):''}</div>
+      </div>
+      <div class="history-amount ${cls==='pay'?'pay':'add'}">${sign}${fmt(h.amount)}</div>`;
+    hist.appendChild(d);
+  });
 }
 
-// ================= ADD =================
-function addDebt(data){
-  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName("debts");
-
-  sheet.appendRow([
-    new Date().getTime(),
-    data.from_user,
-    data.to_user,
-    data.amount,
-    data.title,
-    "pending"
-  ]);
-
-  return json({status:"ok"});
+// ── Pay ───────────────────────────────────────────────────────
+function openPayModal(){
+  const {from,to} = currentDetail;
+  document.getElementById('pay-info-box').innerHTML =
+    `เป็นหนี้ <b>${db.users[to].name}</b> อยู่ <b style="color:var(--red);">${fmt(getDebt(from,to))}</b>`;
+  document.getElementById('pay-amount').value = '';
+  document.getElementById('pay-note').value = '';
+  payMethod = 'cash'; selectPayMethod('cash');
+  openModal('modal-pay');
+}
+function selectPayMethod(m){
+  payMethod = m;
+  document.getElementById('pay-method-cash').classList.toggle('active',m==='cash');
+  document.getElementById('pay-method-transfer').classList.toggle('active',m==='transfer');
+}
+function confirmPay(){
+  const amt = parseFloat(document.getElementById('pay-amount').value);
+  if(!amt||amt<=0){ showToast('⚠️ ใส่จำนวนเงิน'); return; }
+  const max = getDebt(currentDetail.from,currentDetail.to);
+  if(amt>max){ showToast(`⚠️ จ่ายได้สูงสุด ${fmt(max)}`); return; }
+  const {from,to} = currentDetail;
+  addDebtRaw(from,to,-amt);
+  db.history.push({ id:newId(), from, to, type:'pay', amount:amt,
+    note:document.getElementById('pay-note').value||'จ่ายหนี้', method:payMethod, ts:Date.now() });
+  saveAndSync(); closeModal('modal-pay'); renderDetail();
+  showToast('✅ บันทึกการจ่ายแล้ว!');
 }
 
-// ================= SPLIT =================
-function splitBill(data){
-  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName("debts");
+// ── Add Debt (detail, creditor side) ─────────────────────────
+function openAddDebtModal(){
+  document.getElementById('add-debt-title').textContent = `➕ เพิ่มหนี้ของ ${db.users[currentDetail.from].name}`;
+  document.getElementById('add-debt-amount').value = '';
+  document.getElementById('add-debt-note').value = '';
+  openModal('modal-add-debt');
+}
+function confirmAddDebt(){
+  const amt = parseFloat(document.getElementById('add-debt-amount').value);
+  if(!amt||amt<=0){ showToast('⚠️ ใส่จำนวนเงิน'); return; }
+  const {from,to} = currentDetail;
+  addDebtRaw(from,to,amt);
+  db.history.push({ id:newId(), from, to, type:'add', amount:amt,
+    note:document.getElementById('add-debt-note').value||'เพิ่มหนี้', ts:Date.now() });
+  saveAndSync(); closeModal('modal-add-debt'); renderDetail();
+  showToast('✅ เพิ่มหนี้แล้ว!');
+}
 
-  const each = data.total / data.people.length;
+// ── Edit Profile ──────────────────────────────────────────────
+function openEditProfile(){
+  const u = db.users[currentUser];
+  document.getElementById('edit-name').value = u.name;
+  selectedEmoji = u.emoji;
+  const grid = document.getElementById('emoji-grid');
+  grid.innerHTML = '';
+  EMOJIS.forEach(em=>{
+    const d = document.createElement('div');
+    d.className = `emoji-opt ${em===u.emoji?'selected':''}`;
+    d.textContent = em;
+    d.onclick = ()=>{ selectedEmoji=em; grid.querySelectorAll('.emoji-opt').forEach(x=>x.classList.remove('selected')); d.classList.add('selected'); };
+    grid.appendChild(d);
+  });
+  openModal('modal-edit-profile');
+}
+function saveProfile(){
+  const name = document.getElementById('edit-name').value.trim();
+  if(!name){ showToast('⚠️ ใส่ชื่อด้วย'); return; }
+  db.users[currentUser].name  = name;
+  db.users[currentUser].emoji = selectedEmoji || db.users[currentUser].emoji;
+  saveAndSync(); closeModal('modal-edit-profile'); renderDash();
+  showToast('✅ อัปเดตโปรไฟล์แล้ว!');
+}
 
-  data.people.forEach(p=>{
-    sheet.appendRow([
-      new Date().getTime(),
-      p,
-      data.from_user,
-      each,
-      data.title,
-      "pending"
-    ]);
+// ── Split ─────────────────────────────────────────────────────
+function openSplit(fromDash){
+  splitFromDash = !!fromDash;
+  splitPayer = null; splitPeople = [];
+  document.getElementById('split-total').value = '';
+  document.getElementById('split-note').value = '';
+  document.getElementById('split-preview').style.display = 'none';
+  document.getElementById('split-back-btn').onclick = ()=>{
+    if(splitFromDash){ showScreen('screen-dashboard'); renderDash(); }
+    else { showScreen('screen-select'); renderSelect(); }
+  };
+  renderSplitLists();
+  showScreen('screen-split');
+}
+
+function renderSplitLists(){
+  const pl=document.getElementById('split-payer-list'), ml=document.getElementById('split-people-list');
+  if(!pl||!ml) return;
+  pl.innerHTML=''; ml.innerHTML='';
+  Object.values(db.users).forEach(u=>{
+    const pSel = splitPayer===u.id;
+    const pd = document.createElement('div');
+    pd.className=`checkbox-item ${pSel?'selected':''}`;
+    pd.innerHTML=`<div class="checkbox-box">${pSel?'✓':''}</div><div class="checkbox-avatar">${u.emoji}</div><div class="checkbox-name">${u.name}</div>`;
+    pd.onclick=()=>{ splitPayer=u.id; renderSplitLists(); updateSplitPreview(); };
+    pl.appendChild(pd);
+
+    const mSel = splitPeople.includes(u.id);
+    const md = document.createElement('div');
+    md.className=`checkbox-item ${mSel?'selected':''}`;
+    md.innerHTML=`<div class="checkbox-box">${mSel?'✓':''}</div><div class="checkbox-avatar">${u.emoji}</div><div class="checkbox-name">${u.name}</div>`;
+    md.onclick=()=>{
+      if(splitPeople.includes(u.id)) splitPeople=splitPeople.filter(x=>x!==u.id); else splitPeople.push(u.id);
+      renderSplitLists(); updateSplitPreview();
+    };
+    ml.appendChild(md);
+  });
+}
+
+function updateSplitPreview(){
+  const total=parseFloat(document.getElementById('split-total').value);
+  const prev=document.getElementById('split-preview');
+  if(!total||!splitPayer||!splitPeople.length){ prev.style.display='none'; return; }
+  const perHead=Math.ceil(total/splitPeople.length);
+  let html=`บิล ${fmt(total)} ÷ ${splitPeople.length} คน = คนละ <b style="color:var(--yellow);">${fmt(perHead)}</b><br><br>`;
+  splitPeople.filter(p=>p!==splitPayer).forEach(p=>{
+    html+=`${db.users[p].emoji} ${db.users[p].name} → เป็นหนี้ ${db.users[splitPayer].emoji} ${db.users[splitPayer].name} +${fmt(perHead)}<br>`;
+  });
+  if(splitPeople.includes(splitPayer)) html+=`<span style="color:var(--green);">✓ ${db.users[splitPayer].name} ออกเงินแล้ว ไม่ต้องจ่ายเพิ่ม</span>`;
+  document.getElementById('split-preview-content').innerHTML=html;
+  prev.style.display='block';
+}
+
+function confirmSplit(){
+  const total=parseFloat(document.getElementById('split-total').value);
+  const note=document.getElementById('split-note').value||'หารบิล';
+  if(!total||total<=0){ showToast('⚠️ ใส่ยอดบิล'); return; }
+  if(!splitPayer){ showToast('⚠️ เลือกคนจ่าย'); return; }
+  if(!splitPeople.length){ showToast('⚠️ เลือกคนร่วมหาร'); return; }
+  const perHead=Math.ceil(total/splitPeople.length);
+  const ts=Date.now();
+  splitPeople.filter(p=>p!==splitPayer).forEach(p=>{
+    addDebtRaw(p,splitPayer,perHead);
+    db.history.push({ id:newId(), from:p, to:splitPayer, type:'split', amount:perHead, note, ts });
+  });
+  saveAndSync();
+  showToast(`✅ หารเรียบร้อย! คนละ ${fmt(perHead)}`);
+  if(splitFromDash){ showScreen('screen-dashboard'); renderDash(); }
+  else { showScreen('screen-select'); renderSelect(); }
+}
+
+// ── Modal Utils ───────────────────────────────────────────────
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(ov=>{
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
+});
+
+// ── Setup: User Management ───────────────────────────────────
+const USER_COLORS = ['#c83dff','#00c6ff','#5aff8a','#6ad3ff','#ffd060','#ff5a7a','#ff914d','#a8ff78','#7c6aff','#ff6a9e','#00e5cc','#f9ca24'];
+let newUserEmoji = '😎';
+let newUserColor = '#7c6aff';
+let delUserId = null;
+let logFilter = 'all';
+
+function renderSetupScreen(){
+  renderSetupUserList();
+  renderActivityLog();
+  // fill setup url if exists
+  const urlInput = document.getElementById('setup-url');
+  if(urlInput && scriptUrl) urlInput.value = scriptUrl;
+}
+
+function renderSetupUserList(){
+  const list = document.getElementById('setup-user-list');
+  if(!list) return;
+  list.innerHTML = '';
+  Object.values(db.users).forEach(u => {
+    const owe  = Object.values(db.debts[u.id]||{}).reduce((a,b)=>a+b,0);
+    const owed = Object.keys(db.users).filter(k=>k!==u.id).reduce((a,k)=>a+getDebt(k,u.id),0);
+    const row = document.createElement('div');
+    row.className = 'user-manage-row';
+    row.innerHTML = `
+      <div class="user-manage-avatar">${u.emoji}</div>
+      <div class="user-manage-info">
+        <div class="user-manage-name">${u.name}</div>
+        <div class="user-manage-sub">หนี้: ${fmt(owe)} | ลูกหนี้: ${fmt(owed)}</div>
+      </div>
+      <button class="user-manage-del" onclick="openDelUserModal('${u.id}')">🗑️ ลบ</button>`;
+    list.appendChild(row);
+  });
+}
+
+function openAddUserModal(){
+  newUserEmoji = '😎';
+  newUserColor = '#7c6aff';
+  document.getElementById('new-user-name').value = '';
+
+  // emoji grid
+  const eg = document.getElementById('new-user-emoji-grid');
+  eg.innerHTML = '';
+  EMOJIS.forEach(em => {
+    const d = document.createElement('div');
+    d.className = `emoji-opt ${em===newUserEmoji?'selected':''}`;
+    d.textContent = em;
+    d.onclick = () => {
+      newUserEmoji = em;
+      eg.querySelectorAll('.emoji-opt').forEach(x=>x.classList.remove('selected'));
+      d.classList.add('selected');
+    };
+    eg.appendChild(d);
   });
 
-  return json({status:"ok"});
+  // color grid
+  const cg = document.getElementById('new-user-color-grid');
+  cg.innerHTML = '';
+  USER_COLORS.forEach(col => {
+    const d = document.createElement('div');
+    d.className = `color-dot ${col===newUserColor?'selected':''}`;
+    d.style.background = col;
+    d.onclick = () => {
+      newUserColor = col;
+      cg.querySelectorAll('.color-dot').forEach(x=>x.classList.remove('selected'));
+      d.classList.add('selected');
+    };
+    cg.appendChild(d);
+  });
+  openModal('modal-add-user');
 }
 
-// ================= PAY =================
-function payDebt(data){
-  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName("debts");
-  const rows = sheet.getDataRange().getValues();
+function confirmAddUser(){
+  const name = document.getElementById('new-user-name').value.trim();
+  if(!name){ showToast('⚠️ ใส่ชื่อด้วย'); return; }
+  // generate id from name (slugify)
+  let id = name.toLowerCase().replace(/[^a-z0-9ก-๙]/g,'').substring(0,12) || ('user'+Date.now());
+  if(db.users[id]) id = id + Date.now(); // dedupe
+  db.users[id] = { id, name, emoji: newUserEmoji, color: newUserColor };
+  db.debts[id] = {};
+  // log
+  db.history.push({ id:newId(), type:'user-add', userId:id, note:`เพิ่มผู้ใช้ "${name}"`, ts:Date.now() });
+  saveAndSync();
+  closeModal('modal-add-user');
+  renderSetupUserList();
+  renderActivityLog();
+  renderSelect();
+  showToast(`✅ เพิ่ม ${name} แล้ว!`);
+}
 
-  for(let i=1;i<rows.length;i++){
-    if(rows[i][0]==data.id){
-      sheet.getRange(i+1,6).setValue("paid");
-    }
+function openDelUserModal(uid){
+  delUserId = uid;
+  const u = db.users[uid];
+  const owe  = Object.values(db.debts[uid]||{}).reduce((a,b)=>a+b,0);
+  const owed = Object.keys(db.users).filter(k=>k!==uid).reduce((a,k)=>a+getDebt(k,uid),0);
+  document.getElementById('del-user-info').innerHTML =
+    `<b>${u.emoji} ${u.name}</b><br>มีหนี้ค้างอยู่: ${fmt(owe)} · มีลูกหนี้: ${fmt(owed)}`;
+  openModal('modal-del-user');
+}
+
+function confirmDelUser(){
+  if(!delUserId) return;
+  const u = db.users[delUserId];
+  // log before delete
+  db.history.push({ id:newId(), type:'user-del', userId:delUserId, note:`ลบผู้ใช้ "${u.name}"`, ts:Date.now() });
+  // remove from users
+  delete db.users[delUserId];
+  // remove their debts
+  delete db.debts[delUserId];
+  // remove debts pointing to them
+  Object.keys(db.debts).forEach(k=>{ if(db.debts[k]) delete db.debts[k][delUserId]; });
+  // remove history entries for them (optional: keep for audit)
+  // keep history — just orphaned entries will still show in log
+  saveAndSync();
+  closeModal('modal-del-user');
+  renderSetupUserList();
+  renderActivityLog();
+  renderSelect();
+  showToast(`🗑️ ลบ ${u.name} แล้ว`);
+  delUserId = null;
+}
+
+// ── Activity Log ──────────────────────────────────────────────
+function renderActivityLog(){
+  const list = document.getElementById('activity-log-list');
+  if(!list) return;
+  list.innerHTML = '';
+  const all = [...db.history].sort((a,b)=>b.ts-a.ts);
+  const filtered = logFilter==='all' ? all : all.filter(h=>h.type===logFilter);
+  if(!filtered.length){
+    list.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:16px;font-size:.85rem;">ไม่มีรายการ</div>`;
+    return;
   }
-
-  return json({status:"ok"});
+  filtered.slice(0,60).forEach(h=>{
+    const d = document.createElement('div');
+    d.className = 'log-item';
+    let icon='📝', iconCls='add', amtHtml='', noteHtml='';
+    const fU = db.users[h.from]||{name:h.from||'?',emoji:'👤'};
+    const tU = db.users[h.to]||{name:h.to||'?',emoji:'👤'};
+    if(h.type==='pay'){
+      icon='💸'; iconCls='pay';
+      noteHtml=`${fU.emoji} <b>${fU.name}</b> จ่ายหนี้ ${tU.emoji} <b>${tU.name}</b>${h.note?' · '+h.note:''}${h.method?' ('+( h.method==='transfer'?'อัพสลีฟ':'เงินสด')+')':''}`;
+      amtHtml=`<div class="log-amount pay">-${fmt(h.amount)}</div>`;
+    } else if(h.type==='add'){
+      icon='➕'; iconCls='add';
+      noteHtml=`${fU.emoji} <b>${fU.name}</b> เป็นหนี้เพิ่ม ${tU.emoji} <b>${tU.name}</b>${h.note?' · '+h.note:''}`;
+      amtHtml=`<div class="log-amount add">+${fmt(h.amount)}</div>`;
+    } else if(h.type==='split'){
+      icon='🍻'; iconCls='split';
+      noteHtml=`${fU.emoji} <b>${fU.name}</b> หารบิลกับ ${tU.emoji} <b>${tU.name}</b>${h.note?' · '+h.note:''}`;
+      amtHtml=`<div class="log-amount add">+${fmt(h.amount)}</div>`;
+    } else if(h.type==='user-add'){
+      icon='👤'; iconCls='user-add';
+      noteHtml=`<b>${h.note||'เพิ่มผู้ใช้'}</b>`;
+      amtHtml=`<div class="log-amount neutral">👋</div>`;
+    } else if(h.type==='user-del'){
+      icon='🗑️'; iconCls='user-del';
+      noteHtml=`<b>${h.note||'ลบผู้ใช้'}</b>`;
+      amtHtml=`<div class="log-amount neutral">❌</div>`;
+    }
+    d.innerHTML = `
+      <div class="log-icon ${iconCls}">${icon}</div>
+      <div class="log-info">
+        <div class="log-note">${noteHtml}</div>
+        <div class="log-date">${thaiDate(h.ts)}</div>
+      </div>
+      ${amtHtml}`;
+    list.appendChild(d);
+  });
+  if(filtered.length>60){
+    list.insertAdjacentHTML('beforeend',`<div style="text-align:center;color:var(--text-muted);padding:12px;font-size:.78rem;">แสดง 60 รายการล่าสุด (ทั้งหมด ${filtered.length})</div>`);
+  }
 }
 
-// ================= UTIL =================
-function json(data){
-  return ContentService
-    .createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
+function filterLog(type){
+  logFilter = type;
+  ['all','pay','add','split'].forEach(t=>{
+    const btn = document.getElementById('log-filter-'+t);
+    if(btn) btn.classList.toggle('active', t===type);
+  });
+  renderActivityLog();
 }
 
+// ── Init ──────────────────────────────────────────────────────
+loadLocal();
+renderSelect();
+showScreen('screen-select');
+if(scriptUrl) syncPull();
+</script>
 </body>
 </html>
