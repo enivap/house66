@@ -49,6 +49,12 @@
   .user-card{position:relative;border-radius:24px;overflow:hidden;cursor:pointer;aspect-ratio:.85;border:1px solid var(--border);transition:transform .2s;background:var(--surface);}
   .user-card:active{transform:scale(.96);}
   .user-card-bg{position:absolute;inset:0;opacity:.55;}
+  .avatar-img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .upload-zone{border:2px dashed rgba(124,106,255,.4);border-radius:var(--radius-sm);padding:18px;text-align:center;cursor:pointer;transition:border-color .2s;position:relative;overflow:hidden;}
+  .upload-zone:hover{border-color:var(--accent);}
+  .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+  .upload-preview{width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;border:3px solid var(--accent);}
+  .upload-label{font-size:.82rem;color:var(--text-muted);}
   .user-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 40%,transparent);}
   .user-card-content{position:absolute;bottom:0;left:0;right:0;padding:16px 14px;}
   .user-avatar-circle{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:8px;border:2px solid rgba(255,255,255,.3);}
@@ -360,6 +366,16 @@
       <input class="form-input" id="new-user-name" placeholder="เช่น มิ้น...">
     </div>
     <div class="form-group">
+      <label class="form-label">รูปโปรไฟล์ (ไม่บังคับ)</label>
+      <div class="upload-zone" onclick="document.getElementById('new-user-file-input').click()">
+        <input type="file" id="new-user-file-input" accept="image/*" onchange="handleNewUserPhoto(event)" style="display:none">
+        <div id="new-user-photo-preview-wrap">
+          <div style="font-size:2.5rem;margin-bottom:6px;">📷</div>
+          <div class="upload-label" style="font-size:.78rem;">แตะเพื่อเลือกรูป (ไม่บังคับ)</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
       <label class="form-label">Emoji โปรไฟล์</label>
       <div class="emoji-grid" id="new-user-emoji-grid"></div>
     </div>
@@ -465,11 +481,25 @@
     <div class="modal-handle"></div>
     <div class="modal-title">✏️ แก้ไขโปรไฟล์</div>
     <div class="form-group">
+      <label class="form-label">รูปโปรไฟล์</label>
+      <div class="upload-zone" onclick="document.getElementById('profile-file-input').click()">
+        <input type="file" id="profile-file-input" accept="image/*" onchange="handleProfilePhoto(event)" style="display:none">
+        <div id="profile-photo-preview-wrap">
+          <div id="profile-photo-placeholder" style="font-size:3rem;margin-bottom:8px;">📷</div>
+          <div class="upload-label">แตะเพื่อเลือกรูป<br><span style="font-size:.72rem;opacity:.6;">JPG, PNG, HEIC — ปรับขนาดอัตโนมัติ</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn btn-secondary" style="flex:1;font-size:.8rem;padding:9px;" onclick="document.getElementById('profile-file-input').click()">📂 เลือกรูป</button>
+        <button class="btn btn-danger" style="flex:1;font-size:.8rem;padding:9px;" id="remove-photo-btn" onclick="removeProfilePhoto()">🗑️ ลบรูป</button>
+      </div>
+    </div>
+    <div class="form-group">
       <label class="form-label">ชื่อ</label>
       <input class="form-input" id="edit-name" placeholder="ชื่อของคุณ">
     </div>
-    <div class="form-group">
-      <label class="form-label">เลือก Emoji</label>
+    <div class="form-group" id="emoji-section">
+      <label class="form-label">Emoji (ใช้แทนรูปถ้าไม่มีรูป)</label>
       <div class="emoji-grid" id="emoji-grid"></div>
     </div>
     <div style="display:flex;gap:10px;margin-top:4px;">
@@ -647,6 +677,38 @@ function setDebt(f,t,v){ if(!db.debts[f]) db.debts[f]={}; db.debts[f][t]=Math.ma
 function addDebtRaw(f,t,d){ setDebt(f,t,getDebt(f,t)+d); }
 function newId(){ return Date.now()*1000 + Math.floor(Math.random()*999); }
 
+// ── Avatar helpers ────────────────────────────────────────────
+// Returns inline HTML for an avatar: photo if available, else emoji
+// size: px number, border: css string or ''
+function avatarHTML(u, sizePx, extraStyle=''){
+  if(u.photo){
+    return `<img src="${u.photo}" class="avatar-img" style="width:${sizePx}px;height:${sizePx}px;${extraStyle}" alt="${u.name}">`;
+  }
+  return `<span style="font-size:${Math.round(sizePx*0.5)}px;line-height:1;${extraStyle}">${u.emoji||'😊'}</span>`;
+}
+
+// Resize + compress photo to base64, max 200px, quality 0.7
+function compressImage(file, maxPx=200, quality=0.72){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const scale = Math.min(1, maxPx/Math.max(img.width,img.height));
+        const w = Math.round(img.width*scale), h = Math.round(img.height*scale);
+        const canvas = document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 // ── Screens ───────────────────────────────────────────────────
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -668,11 +730,16 @@ function renderSelect(){
     const card = document.createElement('div');
     card.className = `user-card ${THEMES[u.id]||''} fade-up`;
     card.style.animationDelay = (i*.08)+'s';
+    const bgStyle = u.photo
+      ? `background:url(${u.photo}) center/cover no-repeat; opacity:0.75;`
+      : '';
     card.innerHTML = `
-      <div class="user-card-bg"></div>
+      <div class="user-card-bg" style="${bgStyle}"></div>
       <div class="user-card-overlay"></div>
       <div class="user-card-content">
-        <div class="user-avatar-circle">${u.emoji}</div>
+        <div class="user-avatar-circle" style="${u.photo?'overflow:hidden;padding:0;border:2px solid rgba(255,255,255,.5);':''}">
+          ${u.photo ? `<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;" alt="${u.name}">` : u.emoji}
+        </div>
         <div class="user-card-name">${u.name}</div>
         <div class="user-card-sub">${net>=0?'💰 มีคนติดหนี้':'😰 มีหนี้ค้าง'}</div>
       </div>
@@ -685,7 +752,25 @@ function renderSelect(){
 // ── Dashboard ─────────────────────────────────────────────────
 function renderDash(){
   const u = db.users[currentUser];
-  document.getElementById('dash-avatar-emoji').textContent = u.emoji;
+  // dash avatar: photo or emoji
+  const dashAv = document.getElementById('dash-avatar-emoji');
+  if(u.photo){
+    dashAv.style.display='none';
+    let existingImg = document.getElementById('dash-avatar-img');
+    if(!existingImg){
+      existingImg = document.createElement('img');
+      existingImg.id = 'dash-avatar-img';
+      existingImg.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0;';
+      dashAv.parentNode.insertBefore(existingImg, dashAv);
+    }
+    existingImg.src = u.photo;
+    existingImg.style.display = '';
+  } else {
+    dashAv.textContent = u.emoji;
+    dashAv.style.display = '';
+    const existingImg = document.getElementById('dash-avatar-img');
+    if(existingImg) existingImg.style.display='none';
+  }
   document.getElementById('dash-name').textContent = u.name;
 
   const owe  = Object.values(db.debts[currentUser]||{}).reduce((a,b)=>a+b,0);
@@ -717,8 +802,11 @@ function makeDebtItem(personId,amt,type,onclick){
   const u = db.users[personId];
   const d = document.createElement('div');
   d.className = `debt-item ${type==='debt'?'debt-type':'credit-type'}`;
+  const avContent = u.photo
+    ? `<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${u.name}">`
+    : u.emoji;
   d.innerHTML = `
-    <div class="debt-person-avatar" style="background:${u.color}22;">${u.emoji}</div>
+    <div class="debt-person-avatar" style="${u.photo?'':'background:'+u.color+'22;'} overflow:hidden;">${avContent}</div>
     <div class="debt-info">
       <div class="debt-person-name">${u.name}</div>
       <div class="debt-desc">${type==='debt'?'ฉันเป็นหนี้':'เป็นหนี้ฉัน'}</div>
@@ -776,7 +864,15 @@ function renderDetail(){
   const amt = getDebt(from,to);
   const iAmFrom = from===currentUser;
 
-  document.getElementById('detail-avatar').textContent   = iAmFrom?tU.emoji:fU.emoji;
+  const detU = iAmFrom ? tU : fU;
+  const detAvEl = document.getElementById('detail-avatar');
+  if(detU.photo){
+    detAvEl.innerHTML = `<img src="${detU.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${detU.name}">`;
+    detAvEl.style.overflow='hidden'; detAvEl.style.padding='0';
+  } else {
+    detAvEl.textContent = detU.emoji;
+    detAvEl.style.overflow=''; detAvEl.style.padding='';
+  }
   document.getElementById('detail-name').textContent     = iAmFrom?tU.name:fU.name;
   document.getElementById('detail-amount').textContent   = fmt(amt);
   document.getElementById('detail-amount').className     = `detail-amount-big ${iAmFrom?'red':'green'}`;
@@ -876,6 +972,11 @@ function openEditProfile(){
   const u = db.users[currentUser];
   document.getElementById('edit-name').value = u.name;
   selectedEmoji = u.emoji;
+  pendingPhoto = u.photo || null;
+  // reset file input
+  document.getElementById('profile-file-input').value = '';
+  // show existing photo or placeholder
+  _refreshPhotoPreview();
   const grid = document.getElementById('emoji-grid');
   grid.innerHTML = '';
   EMOJIS.forEach(em=>{
@@ -887,12 +988,49 @@ function openEditProfile(){
   });
   openModal('modal-edit-profile');
 }
+
+let pendingPhoto = null;
+let newUserPendingPhoto = null;
+
+function _refreshPhotoPreview(){
+  const wrap = document.getElementById('profile-photo-preview-wrap');
+  const removeBtn = document.getElementById('remove-photo-btn');
+  if(!wrap) return;
+  if(pendingPhoto){
+    wrap.innerHTML = `<img src="${pendingPhoto}" class="upload-preview" alt="preview">
+      <div class="upload-label" style="font-size:.75rem;">แตะเพื่อเปลี่ยนรูป</div>`;
+    if(removeBtn) removeBtn.style.display='';
+  } else {
+    wrap.innerHTML = `<div id="profile-photo-placeholder" style="font-size:3rem;margin-bottom:8px;">📷</div>
+      <div class="upload-label">แตะเพื่อเลือกรูป<br><span style="font-size:.72rem;opacity:.6;">JPG, PNG, HEIC — ปรับขนาดอัตโนมัติ</span></div>`;
+    if(removeBtn) removeBtn.style.display='none';
+  }
+}
+
+async function handleProfilePhoto(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  try {
+    pendingPhoto = await compressImage(file, 300, 0.75);
+    _refreshPhotoPreview();
+    showToast('📷 เลือกรูปแล้ว กด บันทึก เพื่อยืนยัน');
+  } catch(err){ showToast('⚠️ โหลดรูปไม่ได้'); }
+}
+
+function removeProfilePhoto(){
+  pendingPhoto = null;
+  document.getElementById('profile-file-input').value = '';
+  _refreshPhotoPreview();
+  showToast('🗑️ ลบรูปแล้ว');
+}
 function saveProfile(){
   const name = document.getElementById('edit-name').value.trim();
   if(!name){ showToast('⚠️ ใส่ชื่อด้วย'); return; }
   db.users[currentUser].name  = name;
   db.users[currentUser].emoji = selectedEmoji || db.users[currentUser].emoji;
-  saveAndSync(); closeModal('modal-edit-profile'); renderDash();
+  // pendingPhoto: null = remove, string = set, undefined = keep (won't happen since we always set)
+  if(pendingPhoto !== undefined) db.users[currentUser].photo = pendingPhoto || null;
+  saveAndSync(); closeModal('modal-edit-profile'); renderDash(); renderSelect();
   showToast('✅ อัปเดตโปรไฟล์แล้ว!');
 }
 
@@ -998,8 +1136,11 @@ function renderSetupUserList(){
     const owed = Object.keys(db.users).filter(k=>k!==u.id).reduce((a,k)=>a+getDebt(k,u.id),0);
     const row = document.createElement('div');
     row.className = 'user-manage-row';
+    const manAvHTML = u.photo
+      ? `<img src="${u.photo}" style="width:36px;height:36px;object-fit:cover;border-radius:50%;" alt="${u.name}">`
+      : u.emoji;
     row.innerHTML = `
-      <div class="user-manage-avatar">${u.emoji}</div>
+      <div class="user-manage-avatar" style="overflow:hidden;">${manAvHTML}</div>
       <div class="user-manage-info">
         <div class="user-manage-name">${u.name}</div>
         <div class="user-manage-sub">หนี้: ${fmt(owe)} | ลูกหนี้: ${fmt(owed)}</div>
@@ -1012,7 +1153,12 @@ function renderSetupUserList(){
 function openAddUserModal(){
   newUserEmoji = '😎';
   newUserColor = '#7c6aff';
+  newUserPendingPhoto = null;
   document.getElementById('new-user-name').value = '';
+  document.getElementById('new-user-file-input').value = '';
+  const wrap = document.getElementById('new-user-photo-preview-wrap');
+  if(wrap) wrap.innerHTML = `<div style="font-size:2.5rem;margin-bottom:6px;">📷</div>
+    <div class="upload-label" style="font-size:.78rem;">แตะเพื่อเลือกรูป (ไม่บังคับ)</div>`;
 
   // emoji grid
   const eg = document.getElementById('new-user-emoji-grid');
@@ -1046,13 +1192,25 @@ function openAddUserModal(){
   openModal('modal-add-user');
 }
 
+async function handleNewUserPhoto(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  try {
+    newUserPendingPhoto = await compressImage(file, 300, 0.75);
+    const wrap = document.getElementById('new-user-photo-preview-wrap');
+    if(wrap) wrap.innerHTML = `<img src="${newUserPendingPhoto}" class="upload-preview" alt="preview">
+      <div class="upload-label" style="font-size:.75rem;">แตะเพื่อเปลี่ยนรูป</div>`;
+    showToast('📷 เลือกรูปแล้ว');
+  } catch(err){ showToast('⚠️ โหลดรูปไม่ได้'); }
+}
+
 function confirmAddUser(){
   const name = document.getElementById('new-user-name').value.trim();
   if(!name){ showToast('⚠️ ใส่ชื่อด้วย'); return; }
   // generate id from name (slugify)
   let id = name.toLowerCase().replace(/[^a-z0-9ก-๙]/g,'').substring(0,12) || ('user'+Date.now());
   if(db.users[id]) id = id + Date.now(); // dedupe
-  db.users[id] = { id, name, emoji: newUserEmoji, color: newUserColor };
+  db.users[id] = { id, name, emoji: newUserEmoji, color: newUserColor, photo: newUserPendingPhoto||null };
   db.debts[id] = {};
   // log
   db.history.push({ id:newId(), type:'user-add', userId:id, note:`เพิ่มผู้ใช้ "${name}"`, ts:Date.now() });
