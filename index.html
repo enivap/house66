@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
     />
-    <title>House66💸จัดการหนี้</title>
+    <title>HOUSE66 Dept💸</title>
+    <link rel="icon" href="house66.png?v=2" />
     <link
       href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;900&family=Sarabun:wght@300;400;500;600&display=swap"
       rel="stylesheet"
@@ -160,137 +161,6 @@
         margin-bottom: 10px;
       }
 
-      /* User Management Card */
-      .user-mgmt-card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 18px;
-        margin-bottom: 14px;
-      }
-      .user-mgmt-card h3 {
-        font-size: 0.8rem;
-        font-weight: 700;
-        margin-bottom: 12px;
-        color: var(--accent);
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .user-list-manage {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin-bottom: 16px;
-        max-height: 200px;
-        overflow-y: auto;
-      }
-      .user-manage-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 10px 12px;
-      }
-      .user-manage-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .user-manage-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        background: rgba(255, 255, 255, 0.1);
-        overflow: hidden;
-      }
-      .user-manage-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-      .user-manage-name {
-        font-size: 0.9rem;
-        font-weight: 500;
-      }
-      .user-manage-id {
-        font-size: 0.65rem;
-        color: var(--text-muted);
-        margin-left: 6px;
-      }
-      .delete-user-btn {
-        background: rgba(255, 90, 122, 0.15);
-        border: 1px solid rgba(255, 90, 122, 0.3);
-        color: var(--red);
-        border-radius: 20px;
-        padding: 4px 12px;
-        font-size: 0.7rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.15s;
-      }
-      .delete-user-btn:active {
-        transform: scale(0.95);
-      }
-      .delete-user-btn.disabled {
-        opacity: 0.3;
-        pointer-events: none;
-      }
-      .add-user-form {
-        display: flex;
-        gap: 8px;
-        margin-top: 12px;
-        flex-wrap: wrap;
-      }
-      .add-user-input {
-        flex: 1;
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 10px 12px;
-        color: var(--text);
-        font-family: "Kanit", sans-serif;
-        font-size: 0.85rem;
-        outline: none;
-      }
-      .add-user-input:focus {
-        border-color: var(--accent);
-      }
-      .add-user-emoji {
-        width: 55px;
-        text-align: center;
-        font-size: 1.2rem;
-      }
-      .small-btn {
-        background: var(--accent);
-        border: none;
-        border-radius: var(--radius-sm);
-        padding: 0 16px;
-        color: white;
-        font-weight: 600;
-        font-family: "Kanit", sans-serif;
-        font-size: 0.8rem;
-        cursor: pointer;
-        transition: transform 0.1s;
-      }
-      .small-btn:active {
-        transform: scale(0.95);
-      }
-      .warning-text {
-        font-size: 0.7rem;
-        color: var(--red);
-        margin-top: 8px;
-        text-align: center;
-      }
-
       /* SELECT */
       #screen-select {
         display: flex;
@@ -375,6 +245,44 @@
         inset: 0;
         opacity: 0.55;
       }
+      .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+      .upload-zone {
+        border: 2px dashed rgba(124, 106, 255, 0.4);
+        border-radius: var(--radius-sm);
+        padding: 18px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s;
+        position: relative;
+        overflow: hidden;
+      }
+      .upload-zone:hover {
+        border-color: var(--accent);
+      }
+      .upload-zone input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+      .upload-preview {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 10px;
+        display: block;
+        border: 3px solid var(--accent);
+      }
+      .upload-label {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+      }
       .user-card-overlay {
         position: absolute;
         inset: 0;
@@ -401,13 +309,6 @@
         font-size: 1.4rem;
         margin-bottom: 8px;
         border: 2px solid rgba(255, 255, 255, 0.3);
-        overflow: hidden;
-        background: rgba(0, 0, 0, 0.3);
-      }
-      .user-avatar-circle img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
       }
       .user-card-name {
         font-size: 1.25rem;
@@ -447,9 +348,6 @@
       }
       .theme-ice .user-card-bg {
         background: linear-gradient(135deg, #b05aff, #6ad3ff);
-      }
-      .theme-default .user-card-bg {
-        background: linear-gradient(135deg, #4a4e69, #22223b);
       }
       .bottom-actions {
         padding: 0 18px 10px;
@@ -510,13 +408,6 @@
         border: 3px solid rgba(255, 255, 255, 0.2);
         position: relative;
         cursor: pointer;
-        overflow: hidden;
-        background: rgba(0, 0, 0, 0.3);
-      }
-      .dash-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
       }
       .dash-avatar .edit-icon {
         position: absolute;
@@ -531,7 +422,6 @@
         justify-content: center;
         font-size: 0.65rem;
         border: 2px solid var(--bg);
-        z-index: 1;
       }
       .dash-name {
         font-size: 1.5rem;
@@ -643,13 +533,6 @@
         justify-content: center;
         font-size: 1.2rem;
         flex-shrink: 0;
-        overflow: hidden;
-        background: rgba(0, 0, 0, 0.3);
-      }
-      .debt-person-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
       }
       .debt-info {
         flex: 1;
@@ -727,13 +610,6 @@
         border: 3px solid rgba(255, 255, 255, 0.2);
         position: relative;
         z-index: 1;
-        overflow: hidden;
-        background: rgba(0, 0, 0, 0.3);
-      }
-      .detail-avatar-wrap img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
       }
       .detail-name {
         font-size: 1.5rem;
@@ -978,18 +854,6 @@
       }
       .checkbox-avatar {
         font-size: 1.2rem;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-      }
-      .checkbox-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
       }
       .btn {
         flex: 1;
@@ -1070,44 +934,6 @@
       .info-box b {
         color: var(--accent);
       }
-      .image-upload-area {
-        margin-top: 8px;
-        padding: 16px;
-        background: var(--bg);
-        border: 1px dashed var(--border);
-        border-radius: var(--radius-sm);
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-      .image-upload-area:hover {
-        border-color: var(--accent);
-        background: rgba(124, 106, 255, 0.05);
-      }
-      .image-preview {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        margin: 0 auto 12px;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.1);
-      }
-      .image-preview img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-      .image-preview span {
-        font-size: 2rem;
-      }
-      .upload-hint {
-        font-size: 0.7rem;
-        color: var(--text-muted);
-        margin-top: 8px;
-      }
       @keyframes fadeUp {
         from {
           opacity: 0;
@@ -1120,6 +946,21 @@
       }
       .fade-up {
         animation: fadeUp 0.4s ease both;
+      }
+      .fade-up-1 {
+        animation-delay: 0.05s;
+      }
+      .fade-up-2 {
+        animation-delay: 0.12s;
+      }
+      .fade-up-3 {
+        animation-delay: 0.19s;
+      }
+      .fade-up-4 {
+        animation-delay: 0.26s;
+      }
+      .fade-up-5 {
+        animation-delay: 0.33s;
       }
       .toast {
         position: fixed;
@@ -1144,6 +985,137 @@
         transform: translateX(-50%) translateY(0);
         opacity: 1;
       }
+
+      /* USER MANAGEMENT (setup screen) */
+      .user-manage-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 12px 14px;
+        margin-bottom: 8px;
+      }
+      .user-manage-avatar {
+        font-size: 1.4rem;
+        flex-shrink: 0;
+        width: 36px;
+        text-align: center;
+      }
+      .user-manage-info {
+        flex: 1;
+      }
+      .user-manage-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+      }
+      .user-manage-sub {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+      .user-manage-del {
+        background: rgba(255, 90, 122, 0.12);
+        border: 1px solid rgba(255, 90, 122, 0.3);
+        color: var(--red);
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: "Kanit", sans-serif;
+        flex-shrink: 0;
+      }
+      .user-manage-del:active {
+        opacity: 0.7;
+      }
+      .color-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .color-dot {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 3px solid transparent;
+        transition: transform 0.15s;
+      }
+      .color-dot.selected {
+        border-color: #fff;
+        transform: scale(1.15);
+      }
+      .color-dot:active {
+        transform: scale(0.9);
+      }
+
+      /* ACTIVITY LOG */
+      .log-item {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 13px 15px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+      }
+      .log-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .log-icon.pay {
+        background: rgba(42, 255, 168, 0.12);
+      }
+      .log-icon.add {
+        background: rgba(255, 90, 122, 0.12);
+      }
+      .log-icon.split {
+        background: rgba(255, 208, 96, 0.12);
+      }
+      .log-icon.user-add {
+        background: rgba(124, 106, 255, 0.12);
+      }
+      .log-icon.user-del {
+        background: rgba(255, 90, 122, 0.08);
+      }
+      .log-info {
+        flex: 1;
+      }
+      .log-note {
+        font-size: 0.88rem;
+        font-weight: 500;
+        line-height: 1.4;
+      }
+      .log-date {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-top: 3px;
+      }
+      .log-amount {
+        font-size: 0.95rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .log-amount.pay {
+        color: var(--green);
+      }
+      .log-amount.add {
+        color: var(--red);
+      }
+      .log-amount.neutral {
+        color: var(--text-muted);
+      }
     </style>
   </head>
   <body>
@@ -1153,7 +1125,8 @@
         <div class="setup-logo">🔧</div>
         <div class="setup-title">ตั้งค่า Sync</div>
         <div class="setup-sub">
-          เชื่อมต่อ Google Sheets เพื่อแชร์ข้อมูลทุกคน<br />หรือจัดการผู้ใช้ในกลุ่มด้านล่าง
+          เชื่อมต่อ Google Sheets เพื่อแชร์ข้อมูลทุกคน<br />ข้ามได้ถ้าอยากใช้แบบ
+          Offline ก่อน
         </div>
         <div class="setup-card">
           <h3>📋 Apps Script Code</h3>
@@ -1166,32 +1139,6 @@
             📋 คัดลอกโค้ด
           </button>
         </div>
-
-        <!-- USER MANAGEMENT CARD -->
-        <div class="user-mgmt-card">
-          <h3>👥 จัดการสมาชิกในกลุ่ม</h3>
-          <div class="user-list-manage" id="user-manage-list"></div>
-          <div class="add-user-form">
-            <input
-              type="text"
-              class="add-user-input"
-              id="new-user-name"
-              placeholder="ชื่อสมาชิก"
-              maxlength="20"
-            />
-            <input
-              type="text"
-              class="add-user-input add-user-emoji"
-              id="new-user-emoji"
-              placeholder="😊"
-              maxlength="2"
-              value="😊"
-            />
-            <button class="small-btn" onclick="addNewUser()">➕ เพิ่ม</button>
-          </div>
-          <div class="warning-text" id="user-mgmt-warning"></div>
-        </div>
-
         <div class="setup-card">
           <h3>🚀 วิธี Deploy</h3>
           <div class="setup-step">
@@ -1235,12 +1182,84 @@
             🔗 เชื่อมต่อ
           </button>
         </div>
+
+        <!-- USER MANAGEMENT -->
+        <div class="setup-card">
+          <h3>👥 จัดการผู้ใช้</h3>
+          <div id="setup-user-list"></div>
+          <button
+            class="btn btn-primary btn-full"
+            style="margin-top: 4px; font-size: 0.85rem"
+            onclick="openAddUserModal()"
+          >
+            + เพิ่มคนใหม่
+          </button>
+        </div>
+
+        <!-- ACTIVITY LOG -->
+        <div class="setup-card">
+          <h3>📋 Log กิจกรรมทั้งหมด</h3>
+          <div
+            style="
+              display: flex;
+              gap: 8px;
+              margin-bottom: 12px;
+              flex-wrap: wrap;
+            "
+          >
+            <button
+              class="toggle-btn active"
+              style="flex: 0 0 auto; padding: 6px 12px; font-size: 0.75rem"
+              id="log-filter-all"
+              onclick="filterLog('all')"
+            >
+              ทั้งหมด
+            </button>
+            <button
+              class="toggle-btn"
+              style="flex: 0 0 auto; padding: 6px 12px; font-size: 0.75rem"
+              id="log-filter-pay"
+              onclick="filterLog('pay')"
+            >
+              💸 จ่าย
+            </button>
+            <button
+              class="toggle-btn"
+              style="flex: 0 0 auto; padding: 6px 12px; font-size: 0.75rem"
+              id="log-filter-add"
+              onclick="filterLog('add')"
+            >
+              ➕ เพิ่มหนี้
+            </button>
+            <button
+              class="toggle-btn"
+              style="flex: 0 0 auto; padding: 6px 12px; font-size: 0.75rem"
+              id="log-filter-split"
+              onclick="filterLog('split')"
+            >
+              🍻 หาร
+            </button>
+          </div>
+          <div id="activity-log-list"></div>
+        </div>
+
+        <div style="padding-bottom: 10px">
+          <button
+            class="btn btn-secondary btn-full"
+            onclick="
+              showScreen('screen-select');
+              renderSelect();
+            "
+          >
+            ← กลับหน้าหลัก
+          </button>
+        </div>
       </div>
 
       <!-- SELECT -->
       <div id="screen-select" class="screen">
         <div class="select-header">
-          <h1>House<span> 66</span><br />Dept 💸</h1>
+          <h1>HOUSE<span> 66</span><br />DERJA 💸</h1>
           <p>เลือกโปรไฟล์เพื่อดูรายการ</p>
           <div class="sync-status" id="sync-status" onclick="manualSync()">
             <div class="sync-dot" id="sync-dot"></div>
@@ -1259,10 +1278,7 @@
           <button
             class="btn btn-secondary"
             style="border-radius: var(--radius); padding: 14px; flex: 0 0 auto"
-            onclick="
-              showScreen('screen-setup');
-              renderUserManageList();
-            "
+            onclick="showScreen('screen-setup')"
           >
             ⚙️
           </button>
@@ -1283,19 +1299,7 @@
           </button>
           <div class="dash-profile">
             <div class="dash-avatar" onclick="openEditProfile()">
-              <span id="dash-avatar-emoji" style="display: none">🙂</span>
-              <img
-                id="dash-avatar-img"
-                style="
-                  display: none;
-                  width: 100%;
-                  height: 100%;
-                  object-fit: cover;
-                "
-              />
-              <span id="dash-avatar-fallback" style="font-size: 1.8rem"
-                >🙂</span
-              >
+              <span id="dash-avatar-emoji">🙂</span>
               <span class="edit-icon">✏️</span>
             </div>
             <div>
@@ -1348,7 +1352,7 @@
           >
             ← กลับ
           </button>
-          <div class="detail-avatar-wrap" id="detail-avatar"></div>
+          <div class="detail-avatar-wrap" id="detail-avatar">🙂</div>
           <div class="detail-name" id="detail-name">-</div>
           <div class="detail-amount-big" id="detail-amount">฿0</div>
           <div class="detail-direction" id="detail-direction">-</div>
@@ -1430,6 +1434,93 @@
           <button class="btn btn-primary btn-full" onclick="confirmSplit()">
             ✅ ยืนยันและเพิ่มหนี้
           </button>
+        </div>
+      </div>
+
+      <!-- Add User Modal -->
+      <div class="modal-overlay" id="modal-add-user">
+        <div class="modal">
+          <div class="modal-handle"></div>
+          <div class="modal-title">👤 เพิ่มคนใหม่</div>
+          <div class="form-group">
+            <label class="form-label">ชื่อ</label>
+            <input
+              class="form-input"
+              id="new-user-name"
+              placeholder="เช่น มิ้น..."
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">รูปโปรไฟล์ (ไม่บังคับ)</label>
+            <div
+              class="upload-zone"
+              onclick="document.getElementById('new-user-file-input').click()"
+            >
+              <input
+                type="file"
+                id="new-user-file-input"
+                accept="image/*"
+                onchange="handleNewUserPhoto(event)"
+                style="display: none"
+              />
+              <div id="new-user-photo-preview-wrap">
+                <div style="font-size: 2.5rem; margin-bottom: 6px">📷</div>
+                <div class="upload-label" style="font-size: 0.78rem">
+                  แตะเพื่อเลือกรูป (ไม่บังคับ)
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Emoji โปรไฟล์</label>
+            <div class="emoji-grid" id="new-user-emoji-grid"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">สีธีม</label>
+            <div class="color-grid" id="new-user-color-grid"></div>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 4px">
+            <button
+              class="btn btn-secondary"
+              onclick="closeModal('modal-add-user')"
+            >
+              ยกเลิก
+            </button>
+            <button class="btn btn-primary" onclick="confirmAddUser()">
+              ✅ เพิ่ม
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirm Delete User Modal -->
+      <div class="modal-overlay" id="modal-del-user">
+        <div class="modal">
+          <div class="modal-handle"></div>
+          <div class="modal-title">🗑️ ลบผู้ใช้</div>
+          <div class="info-box" id="del-user-info"></div>
+          <p
+            style="
+              font-size: 0.85rem;
+              color: var(--text-muted);
+              margin-bottom: 16px;
+              line-height: 1.6;
+            "
+          >
+            การลบจะลบข้อมูลหนี้และประวัติทุกรายการของคนนี้ด้วย
+            ไม่สามารถกู้คืนได้
+          </p>
+          <div style="display: flex; gap: 10px">
+            <button
+              class="btn btn-secondary"
+              onclick="closeModal('modal-del-user')"
+            >
+              ยกเลิก
+            </button>
+            <button class="btn btn-danger" onclick="confirmDelUser()">
+              🗑️ ลบเลย
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1570,45 +1661,57 @@
         <div class="modal-handle"></div>
         <div class="modal-title">✏️ แก้ไขโปรไฟล์</div>
         <div class="form-group">
+          <label class="form-label">รูปโปรไฟล์</label>
+          <div
+            class="upload-zone"
+            onclick="document.getElementById('profile-file-input').click()"
+          >
+            <input
+              type="file"
+              id="profile-file-input"
+              accept="image/*"
+              onchange="handleProfilePhoto(event)"
+              style="display: none"
+            />
+            <div id="profile-photo-preview-wrap">
+              <div
+                id="profile-photo-placeholder"
+                style="font-size: 3rem; margin-bottom: 8px"
+              >
+                📷
+              </div>
+              <div class="upload-label">
+                แตะเพื่อเลือกรูป<br /><span
+                  style="font-size: 0.72rem; opacity: 0.6"
+                  >JPG, PNG, HEIC — ปรับขนาดอัตโนมัติ</span
+                >
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 8px">
+            <button
+              class="btn btn-secondary"
+              style="flex: 1; font-size: 0.8rem; padding: 9px"
+              onclick="document.getElementById('profile-file-input').click()"
+            >
+              📂 เลือกรูป
+            </button>
+            <button
+              class="btn btn-danger"
+              style="flex: 1; font-size: 0.8rem; padding: 9px"
+              id="remove-photo-btn"
+              onclick="removeProfilePhoto()"
+            >
+              🗑️ ลบรูป
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
           <label class="form-label">ชื่อ</label>
           <input class="form-input" id="edit-name" placeholder="ชื่อของคุณ" />
         </div>
-        <div class="form-group">
-          <label class="form-label">รูปโปรไฟล์</label>
-          <div
-            class="image-upload-area"
-            id="image-upload-area"
-            onclick="document.getElementById('profile-image-input').click()"
-          >
-            <div class="image-preview" id="image-preview">
-              <span id="preview-emoji">😊</span>
-            </div>
-            <div class="upload-hint">👆 คลิกเพื่ออัปโหลดรูปภาพ</div>
-            <input
-              type="file"
-              id="profile-image-input"
-              accept="image/*"
-              style="display: none"
-              onchange="handleImageUpload(event)"
-            />
-          </div>
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              gap: 8px;
-              margin-top: 8px;
-            "
-          >
-            <div style="flex: 1; border-top: 1px solid var(--border)"></div>
-            <span style="font-size: 0.7rem; color: var(--text-muted)"
-              >หรือเลือก Emoji</span
-            >
-            <div style="flex: 1; border-top: 1px solid var(--border)"></div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">เลือก Emoji</label>
+        <div class="form-group" id="emoji-section">
+          <label class="form-label">Emoji (ใช้แทนรูปถ้าไม่มีรูป)</label>
           <div class="emoji-grid" id="emoji-grid"></div>
         </div>
         <div style="display: flex; gap: 10px; margin-top: 4px">
@@ -1628,7 +1731,7 @@
     <div class="toast" id="toast"></div>
 
     <script>
-      // Apps Script code template (same as before)
+      // ── Apps Script code template ─────────────────────────────────
       const APPS_SCRIPT_CODE = `const SHEET_NAME = 'DebtDB';
 
 function doPost(e) {
@@ -1684,8 +1787,8 @@ function doGet(e) {
           });
       }
 
-      // State
-      const DEFAULT_EMOJIS = [
+      // ── State ─────────────────────────────────────────────────────
+      const EMOJIS = [
         "😎",
         "🥶",
         "🤩",
@@ -1710,48 +1813,18 @@ function doGet(e) {
         "🎲",
         "💎",
         "🚀",
-        "😊",
-        "🐱",
-        "🐶",
-        "🐼",
-        "⭐",
-        "❤️",
       ];
 
       const DEFAULT_DB = {
         users: {
-          pp: {
-            id: "pp",
-            name: "พีพี",
-            emoji: "😎",
-            color: "#c83dff",
-            avatar: null,
-          },
-          ern: {
-            id: "ern",
-            name: "เอิน",
-            emoji: "🤩",
-            color: "#00c6ff",
-            avatar: null,
-          },
-          kung: {
-            id: "kung",
-            name: "กุ้ง",
-            emoji: "😏",
-            color: "#5aff8a",
-            avatar: null,
-          },
-          ice: {
-            id: "ice",
-            name: "ไอซ์",
-            emoji: "😇",
-            color: "#6ad3ff",
-            avatar: null,
-          },
+          pp: { id: "pp", name: "พีพี", emoji: "😎", color: "#c83dff" },
+          ern: { id: "ern", name: "เอิน", emoji: "🤩", color: "#00c6ff" },
+          kung: { id: "kung", name: "กุ้ง", emoji: "😏", color: "#5aff8a" },
+          ice: { id: "ice", name: "ไอซ์", emoji: "😇", color: "#6ad3ff" },
         },
         debts: {
-          ern: { ice: 3390, kung: 1280 },
-          pp: { ice: 230, kung: 1700, ern: 300 },
+          ern: { ice: 0, kung: 0 },
+          pp: { ice: 0, kung: 0, ern: 0 },
           kung: {},
           ice: {},
         },
@@ -1761,7 +1834,7 @@ function doGet(e) {
             from: "ern",
             to: "ice",
             type: "add",
-            amount: 2690,
+            amount: 0,
             note: "หนี้เก่า",
             ts: +new Date("2024-11-01T10:00:00+07:00"),
           },
@@ -1770,7 +1843,7 @@ function doGet(e) {
             from: "ern",
             to: "ice",
             type: "add",
-            amount: 700,
+            amount: 0,
             note: "",
             ts: +new Date("2024-11-10T14:30:00+07:00"),
           },
@@ -1779,7 +1852,7 @@ function doGet(e) {
             from: "pp",
             to: "ice",
             type: "add",
-            amount: 400,
+            amount: 0,
             note: "",
             ts: +new Date("2024-11-02T09:00:00+07:00"),
           },
@@ -1788,7 +1861,7 @@ function doGet(e) {
             from: "pp",
             to: "ice",
             type: "add",
-            amount: 130,
+            amount: 0,
             note: "",
             ts: +new Date("2024-11-05T12:00:00+07:00"),
           },
@@ -1797,7 +1870,7 @@ function doGet(e) {
             from: "pp",
             to: "ice",
             type: "add",
-            amount: 200,
+            amount: 0,
             note: "",
             ts: +new Date("2024-11-08T11:00:00+07:00"),
           },
@@ -1806,7 +1879,7 @@ function doGet(e) {
             from: "pp",
             to: "ice",
             type: "pay",
-            amount: 500,
+            amount: 0,
             note: "จ่ายคืนบางส่วน",
             method: "cash",
             ts: +new Date("2024-11-15T16:00:00+07:00"),
@@ -1816,7 +1889,7 @@ function doGet(e) {
             from: "ern",
             to: "kung",
             type: "add",
-            amount: 380,
+            amount: 0,
             note: "",
             ts: +new Date("2024-11-01T10:00:00+07:00"),
           },
@@ -1825,7 +1898,7 @@ function doGet(e) {
             from: "ern",
             to: "kung",
             type: "add",
-            amount: 200,
+            amount: 0,
             note: "",
             ts: +new Date("2024-11-03T13:00:00+07:00"),
           },
@@ -1834,7 +1907,7 @@ function doGet(e) {
             from: "ern",
             to: "kung",
             type: "add",
-            amount: 700,
+            amount: 0,
             note: "",
             ts: +new Date("2024-11-12T15:00:00+07:00"),
           },
@@ -1843,7 +1916,7 @@ function doGet(e) {
             from: "pp",
             to: "kung",
             type: "add",
-            amount: 1700,
+            amount: 0,
             note: "",
             ts: +new Date("2024-11-01T10:00:00+07:00"),
           },
@@ -1852,7 +1925,7 @@ function doGet(e) {
             from: "pp",
             to: "ern",
             type: "add",
-            amount: 300,
+            amount: 0,
             note: "",
             ts: +new Date("2024-11-07T18:00:00+07:00"),
           },
@@ -1862,10 +1935,9 @@ function doGet(e) {
       let db = JSON.parse(JSON.stringify(DEFAULT_DB));
       let scriptUrl = "";
       let currentUser = null;
-      let currentDetail = null;
+      let currentDetail = null; // { from, to }
       let payMethod = "cash";
       let selectedEmoji = null;
-      let selectedAvatarBase64 = null;
       let splitPayer = null;
       let splitPeople = [];
       let selectedDebtor = null;
@@ -1892,179 +1964,7 @@ function doGet(e) {
         scriptUrl = ls("debt_script_url") || "";
       }
 
-      // Helper to render avatar
-      function renderAvatar(element, user, size = "44px") {
-        if (!element) return;
-        element.innerHTML = "";
-        if (user.avatar && user.avatar.startsWith("data:image")) {
-          const img = document.createElement("img");
-          img.src = user.avatar;
-          img.style.width = "100%";
-          img.style.height = "100%";
-          img.style.objectFit = "cover";
-          element.appendChild(img);
-        } else {
-          element.textContent = user.emoji || "😊";
-          element.style.fontSize = size === "44px" ? "1.4rem" : "1.8rem";
-        }
-      }
-
-      // User Management Functions
-      function renderUserManageList() {
-        const container = document.getElementById("user-manage-list");
-        if (!container) return;
-        container.innerHTML = "";
-        const users = Object.values(db.users);
-        users.forEach((u) => {
-          const isOnlyOne = users.length === 1;
-          const item = document.createElement("div");
-          item.className = "user-manage-item";
-          const avatarDiv = document.createElement("div");
-          avatarDiv.className = "user-manage-avatar";
-          if (u.avatar && u.avatar.startsWith("data:image")) {
-            const img = document.createElement("img");
-            img.src = u.avatar;
-            avatarDiv.appendChild(img);
-          } else {
-            avatarDiv.textContent = u.emoji || "😊";
-            avatarDiv.style.fontSize = "1.2rem";
-          }
-          item.innerHTML = `
-      <div class="user-manage-info">
-        ${avatarDiv.outerHTML}
-        <span class="user-manage-name">${u.name}</span>
-        <span class="user-manage-id">(${u.id})</span>
-      </div>
-      <button class="delete-user-btn ${isOnlyOne ? "disabled" : ""}" 
-        ${isOnlyOne ? "disabled" : `onclick="deleteUser('${u.id}')"`}>
-        🗑️ ลบ
-      </button>
-    `;
-          container.appendChild(item);
-        });
-      }
-
-      function addNewUser() {
-        let name = document.getElementById("new-user-name").value.trim();
-        let emoji = document.getElementById("new-user-emoji").value.trim();
-
-        if (!name) {
-          document.getElementById("user-mgmt-warning").textContent =
-            "⚠️ กรุณาใส่ชื่อสมาชิก";
-          return;
-        }
-        if (!emoji) emoji = "😊";
-
-        let baseId = name.toLowerCase().replace(/[^a-z0-9]/g, "");
-        let newId = baseId;
-        let counter = 1;
-        while (db.users[newId]) {
-          newId = baseId + counter;
-          counter++;
-        }
-        if (!newId) newId = "user" + Date.now();
-
-        const colors = [
-          "#c83dff",
-          "#00c6ff",
-          "#5aff8a",
-          "#6ad3ff",
-          "#ff6aae",
-          "#ffb347",
-          "#6a4e9b",
-          "#3b9e9e",
-        ];
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-
-        db.users[newId] = {
-          id: newId,
-          name: name,
-          emoji: emoji,
-          color: randomColor,
-          avatar: null,
-        };
-
-        if (!db.debts[newId]) db.debts[newId] = {};
-
-        document.getElementById("new-user-name").value = "";
-        document.getElementById("new-user-emoji").value = "😊";
-        document.getElementById("user-mgmt-warning").textContent = "";
-
-        saveAndSync();
-        renderUserManageList();
-        renderSelect();
-        showToast(`✅ เพิ่ม ${name} เข้ากลุ่มแล้ว`);
-      }
-
-      function deleteUser(userId) {
-        const users = Object.values(db.users);
-        if (users.length <= 1) {
-          showToast("⚠️ ไม่สามารถลบสมาชิกคนสุดท้ายได้");
-          return;
-        }
-
-        if (
-          confirm(
-            `แน่ใจหรือไม่ที่จะลบ "${db.users[userId].name}" ออกจากกลุ่ม?\nข้อมูลหนี้ที่เกี่ยวข้องจะถูกลบทั้งหมด`,
-          )
-        ) {
-          delete db.debts[userId];
-          for (let debtor in db.debts) {
-            if (db.debts[debtor][userId]) {
-              delete db.debts[debtor][userId];
-            }
-          }
-          db.history = db.history.filter(
-            (h) => h.from !== userId && h.to !== userId,
-          );
-          delete db.users[userId];
-
-          if (currentUser === userId) {
-            const firstUser = Object.keys(db.users)[0];
-            if (firstUser) currentUser = firstUser;
-            else currentUser = null;
-          }
-
-          saveAndSync();
-          renderUserManageList();
-          renderSelect();
-          if (currentUser) renderDash();
-          showToast(`🗑️ ลบสมาชิกเรียบร้อย`);
-        }
-      }
-
-      // Image upload handler
-      function handleImageUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        if (!file.type.startsWith("image/")) {
-          showToast("⚠️ กรุณาเลือกไฟล์รูปภาพ");
-          return;
-        }
-
-        if (file.size > 2 * 1024 * 1024) {
-          showToast("⚠️ รูปภาพต้องมีขนาดไม่เกิน 2MB");
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          selectedAvatarBase64 = e.target.result;
-          const previewDiv = document.getElementById("image-preview");
-          previewDiv.innerHTML = `<img src="${selectedAvatarBase64}" style="width:100%;height:100%;object-fit:cover;">`;
-          // Clear emoji selection when image is selected
-          if (selectedEmoji) {
-            selectedEmoji = null;
-            document
-              .querySelectorAll(".emoji-opt")
-              .forEach((opt) => opt.classList.remove("selected"));
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-
-      // Sync
+      // ── Sync ──────────────────────────────────────────────────────
       function setSyncUI(state, label) {
         const dot = document.getElementById("sync-dot");
         const lbl = document.getElementById("sync-label");
@@ -2123,7 +2023,7 @@ function doGet(e) {
         syncPush();
       }
 
-      // Setup
+      // ── Setup ─────────────────────────────────────────────────────
       function saveSetup() {
         const url = document.getElementById("setup-url").value.trim();
         if (!url.startsWith("https://script.google.com")) {
@@ -2143,7 +2043,7 @@ function doGet(e) {
         renderSelect();
       }
 
-      // Utils
+      // ── Utils ─────────────────────────────────────────────────────
       function fmt(n) {
         return "฿" + Math.abs(n).toLocaleString("th-TH");
       }
@@ -2178,15 +2078,53 @@ function doGet(e) {
         return Date.now() * 1000 + Math.floor(Math.random() * 999);
       }
 
-      // Screens
+      // ── Avatar helpers ────────────────────────────────────────────
+      // Returns inline HTML for an avatar: photo if available, else emoji
+      // size: px number, border: css string or ''
+      function avatarHTML(u, sizePx, extraStyle = "") {
+        if (u.photo) {
+          return `<img src="${u.photo}" class="avatar-img" style="width:${sizePx}px;height:${sizePx}px;${extraStyle}" alt="${u.name}">`;
+        }
+        return `<span style="font-size:${Math.round(sizePx * 0.5)}px;line-height:1;${extraStyle}">${u.emoji || "😊"}</span>`;
+      }
+
+      // Resize + compress photo to base64, max 200px, quality 0.7
+      function compressImage(file, maxPx = 200, quality = 0.72) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+              const scale = Math.min(
+                1,
+                maxPx / Math.max(img.width, img.height),
+              );
+              const w = Math.round(img.width * scale),
+                h = Math.round(img.height * scale);
+              const canvas = document.createElement("canvas");
+              canvas.width = w;
+              canvas.height = h;
+              canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+              resolve(canvas.toDataURL("image/jpeg", quality));
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // ── Screens ───────────────────────────────────────────────────
       function showScreen(id) {
         document
           .querySelectorAll(".screen")
           .forEach((s) => s.classList.remove("active"));
         document.getElementById(id).classList.add("active");
+        if (id === "screen-setup") renderSetupScreen();
       }
 
-      // Select Screen
+      // ── Select Screen ─────────────────────────────────────────────
       const THEMES = {
         pp: "theme-pp",
         ern: "theme-ern",
@@ -2196,7 +2134,6 @@ function doGet(e) {
 
       function renderSelect() {
         const grid = document.getElementById("user-grid");
-        if (!grid) return;
         grid.innerHTML = "";
         setSyncUI(
           scriptUrl ? "ok" : "off",
@@ -2212,19 +2149,18 @@ function doGet(e) {
             .reduce((a, k) => a + getDebt(k, u.id), 0);
           const net = owed - owe;
           const card = document.createElement("div");
-          card.className = `user-card ${THEMES[u.id] || "theme-default"} fade-up`;
+          card.className = `user-card ${THEMES[u.id] || ""} fade-up`;
           card.style.animationDelay = i * 0.08 + "s";
-
-          const avatarHtml =
-            u.avatar && u.avatar.startsWith("data:image")
-              ? `<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover;">`
-              : `<span style="font-size:1.4rem;">${u.emoji}</span>`;
-
+          const bgStyle = u.photo
+            ? `background:url(${u.photo}) center/cover no-repeat; opacity:0.75;`
+            : "";
           card.innerHTML = `
-      <div class="user-card-bg"></div>
+      <div class="user-card-bg" style="${bgStyle}"></div>
       <div class="user-card-overlay"></div>
       <div class="user-card-content">
-        <div class="user-avatar-circle">${avatarHtml}</div>
+        <div class="user-avatar-circle" style="${u.photo ? "overflow:hidden;padding:0;border:2px solid rgba(255,255,255,.5);" : ""}">
+          ${u.photo ? `<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;" alt="${u.name}">` : u.emoji}
+        </div>
         <div class="user-card-name">${u.name}</div>
         <div class="user-card-sub">${net >= 0 ? "💰 มีคนติดหนี้" : "😰 มีหนี้ค้าง"}</div>
       </div>
@@ -2238,29 +2174,29 @@ function doGet(e) {
         });
       }
 
-      // Dashboard
+      // ── Dashboard ─────────────────────────────────────────────────
       function renderDash() {
         const u = db.users[currentUser];
-        if (!u) {
-          showScreen("screen-select");
-          renderSelect();
-          return;
-        }
-
-        const dashAvatarDiv = document.querySelector(".dash-avatar");
-        if (u.avatar && u.avatar.startsWith("data:image")) {
-          document.getElementById("dash-avatar-img").style.display = "block";
-          document.getElementById("dash-avatar-img").src = u.avatar;
-          document.getElementById("dash-avatar-fallback").style.display =
-            "none";
-          document.getElementById("dash-avatar-emoji").style.display = "none";
+        // dash avatar: photo or emoji
+        const dashAv = document.getElementById("dash-avatar-emoji");
+        if (u.photo) {
+          dashAv.style.display = "none";
+          let existingImg = document.getElementById("dash-avatar-img");
+          if (!existingImg) {
+            existingImg = document.createElement("img");
+            existingImg.id = "dash-avatar-img";
+            existingImg.style.cssText =
+              "width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0;";
+            dashAv.parentNode.insertBefore(existingImg, dashAv);
+          }
+          existingImg.src = u.photo;
+          existingImg.style.display = "";
         } else {
-          document.getElementById("dash-avatar-img").style.display = "none";
-          document.getElementById("dash-avatar-fallback").style.display =
-            "flex";
-          document.getElementById("dash-avatar-fallback").textContent = u.emoji;
+          dashAv.textContent = u.emoji;
+          dashAv.style.display = "";
+          const existingImg = document.getElementById("dash-avatar-img");
+          if (existingImg) existingImg.style.display = "none";
         }
-
         document.getElementById("dash-name").textContent = u.name;
 
         const owe = Object.values(db.debts[currentUser] || {}).reduce(
@@ -2281,6 +2217,7 @@ function doGet(e) {
               ? `<span class="net-badge owe">📉 ติดสุทธิ ${fmt(-net)}</span>`
               : `<span class="net-badge clear">✨ เสมอกัน</span>`;
 
+        // I owe
         const li = document.getElementById("list-i-owe");
         li.innerHTML = "";
         const myDebts = Object.entries(db.debts[currentUser] || {}).filter(
@@ -2297,6 +2234,7 @@ function doGet(e) {
             ),
           );
 
+        // Owe me
         const lm = document.getElementById("list-owe-me");
         lm.innerHTML = "";
         const debtors = Object.keys(db.users).filter(
@@ -2318,12 +2256,11 @@ function doGet(e) {
         const u = db.users[personId];
         const d = document.createElement("div");
         d.className = `debt-item ${type === "debt" ? "debt-type" : "credit-type"}`;
-        const avatarHtml =
-          u.avatar && u.avatar.startsWith("data:image")
-            ? `<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover;">`
-            : `<span style="font-size:1.2rem;">${u.emoji}</span>`;
+        const avContent = u.photo
+          ? `<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${u.name}">`
+          : u.emoji;
         d.innerHTML = `
-    <div class="debt-person-avatar" style="background:${u.color}22;">${avatarHtml}</div>
+    <div class="debt-person-avatar" style="${u.photo ? "" : "background:" + u.color + "22;"} overflow:hidden;">${avContent}</div>
     <div class="debt-info">
       <div class="debt-person-name">${u.name}</div>
       <div class="debt-desc">${type === "debt" ? "ฉันเป็นหนี้" : "เป็นหนี้ฉัน"}</div>
@@ -2334,7 +2271,7 @@ function doGet(e) {
         return d;
       }
 
-      // Add Debtor
+      // ── Add Debtor from Dashboard ─────────────────────────────────
       function openAddDebtorModal() {
         selectedDebtor = null;
         document.getElementById("debtor-amount").value = "";
@@ -2346,11 +2283,7 @@ function doGet(e) {
           .forEach((u) => {
             const d = document.createElement("div");
             d.className = "checkbox-item";
-            const avatarHtml =
-              u.avatar && u.avatar.startsWith("data:image")
-                ? `<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover;">`
-                : `<span style="font-size:1.2rem;">${u.emoji}</span>`;
-            d.innerHTML = `<div class="checkbox-box"></div><div class="checkbox-avatar">${avatarHtml}</div><div class="checkbox-name">${u.name}</div>`;
+            d.innerHTML = `<div class="checkbox-box"></div><div class="checkbox-avatar">${u.emoji}</div><div class="checkbox-name">${u.name}</div>`;
             d.onclick = () => {
               selectedDebtor = u.id;
               list.querySelectorAll(".checkbox-item").forEach((x) => {
@@ -2393,7 +2326,7 @@ function doGet(e) {
         showToast(`✅ เพิ่มหนี้ ${db.users[selectedDebtor].name} แล้ว!`);
       }
 
-      // Detail
+      // ── Detail ────────────────────────────────────────────────────
       function openDetail(fromId, toId) {
         currentDetail = { from: fromId, to: toId };
         renderDetail();
@@ -2407,22 +2340,20 @@ function doGet(e) {
         const amt = getDebt(from, to);
         const iAmFrom = from === currentUser;
 
-        const targetUser = iAmFrom ? tU : fU;
-        const detailAvatar = document.getElementById("detail-avatar");
-        detailAvatar.innerHTML = "";
-        if (targetUser.avatar && targetUser.avatar.startsWith("data:image")) {
-          const img = document.createElement("img");
-          img.src = targetUser.avatar;
-          img.style.width = "100%";
-          img.style.height = "100%";
-          img.style.objectFit = "cover";
-          detailAvatar.appendChild(img);
+        const detU = iAmFrom ? tU : fU;
+        const detAvEl = document.getElementById("detail-avatar");
+        if (detU.photo) {
+          detAvEl.innerHTML = `<img src="${detU.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${detU.name}">`;
+          detAvEl.style.overflow = "hidden";
+          detAvEl.style.padding = "0";
         } else {
-          detailAvatar.textContent = targetUser.emoji;
-          detailAvatar.style.fontSize = "2.5rem";
+          detAvEl.textContent = detU.emoji;
+          detAvEl.style.overflow = "";
+          detAvEl.style.padding = "";
         }
-
-        document.getElementById("detail-name").textContent = targetUser.name;
+        document.getElementById("detail-name").textContent = iAmFrom
+          ? tU.name
+          : fU.name;
         document.getElementById("detail-amount").textContent = fmt(amt);
         document.getElementById("detail-amount").className =
           `detail-amount-big ${iAmFrom ? "red" : "green"}`;
@@ -2432,6 +2363,7 @@ function doGet(e) {
         document.getElementById("detail-header").style.background =
           `linear-gradient(135deg,${(iAmFrom ? tU : fU).color}30 0%,transparent 60%)`;
 
+        // Buttons — always show regardless of amt=0
         const acts = document.getElementById("detail-actions");
         acts.innerHTML = "";
         if (iAmFrom) {
@@ -2450,6 +2382,7 @@ function doGet(e) {
           acts.appendChild(b);
         }
 
+        // History
         const hist = document.getElementById("detail-history");
         hist.innerHTML = "";
         const items = db.history
@@ -2478,7 +2411,7 @@ function doGet(e) {
         });
       }
 
-      // Pay
+      // ── Pay ───────────────────────────────────────────────────────
       function openPayModal() {
         const { from, to } = currentDetail;
         document.getElementById("pay-info-box").innerHTML =
@@ -2527,7 +2460,7 @@ function doGet(e) {
         showToast("✅ บันทึกการจ่ายแล้ว!");
       }
 
-      // Add Debt
+      // ── Add Debt (detail, creditor side) ─────────────────────────
       function openAddDebtModal() {
         document.getElementById("add-debt-title").textContent =
           `➕ เพิ่มหนี้ของ ${db.users[currentDetail.from].name}`;
@@ -2560,50 +2493,70 @@ function doGet(e) {
         showToast("✅ เพิ่มหนี้แล้ว!");
       }
 
-      // Edit Profile
+      // ── Edit Profile ──────────────────────────────────────────────
       function openEditProfile() {
         const u = db.users[currentUser];
         document.getElementById("edit-name").value = u.name;
         selectedEmoji = u.emoji;
-        selectedAvatarBase64 = u.avatar || null;
-
-        const previewDiv = document.getElementById("image-preview");
-        previewDiv.innerHTML = "";
-        if (u.avatar && u.avatar.startsWith("data:image")) {
-          const img = document.createElement("img");
-          img.src = u.avatar;
-          img.style.width = "100%";
-          img.style.height = "100%";
-          img.style.objectFit = "cover";
-          previewDiv.appendChild(img);
-        } else {
-          const span = document.createElement("span");
-          span.textContent = u.emoji;
-          span.style.fontSize = "2rem";
-          previewDiv.appendChild(span);
-        }
-
+        pendingPhoto = u.photo || null;
+        // reset file input
+        document.getElementById("profile-file-input").value = "";
+        // show existing photo or placeholder
+        _refreshPhotoPreview();
         const grid = document.getElementById("emoji-grid");
         grid.innerHTML = "";
-        DEFAULT_EMOJIS.forEach((em) => {
+        EMOJIS.forEach((em) => {
           const d = document.createElement("div");
-          d.className = `emoji-opt ${em === u.emoji && !u.avatar ? "selected" : ""}`;
+          d.className = `emoji-opt ${em === u.emoji ? "selected" : ""}`;
           d.textContent = em;
           d.onclick = () => {
             selectedEmoji = em;
-            selectedAvatarBase64 = null;
             grid
               .querySelectorAll(".emoji-opt")
               .forEach((x) => x.classList.remove("selected"));
             d.classList.add("selected");
-            const previewDiv = document.getElementById("image-preview");
-            previewDiv.innerHTML = `<span style="font-size:2rem;">${em}</span>`;
           };
           grid.appendChild(d);
         });
         openModal("modal-edit-profile");
       }
 
+      let pendingPhoto = null;
+      let newUserPendingPhoto = null;
+
+      function _refreshPhotoPreview() {
+        const wrap = document.getElementById("profile-photo-preview-wrap");
+        const removeBtn = document.getElementById("remove-photo-btn");
+        if (!wrap) return;
+        if (pendingPhoto) {
+          wrap.innerHTML = `<img src="${pendingPhoto}" class="upload-preview" alt="preview">
+      <div class="upload-label" style="font-size:.75rem;">แตะเพื่อเปลี่ยนรูป</div>`;
+          if (removeBtn) removeBtn.style.display = "";
+        } else {
+          wrap.innerHTML = `<div id="profile-photo-placeholder" style="font-size:3rem;margin-bottom:8px;">📷</div>
+      <div class="upload-label">แตะเพื่อเลือกรูป<br><span style="font-size:.72rem;opacity:.6;">JPG, PNG, HEIC — ปรับขนาดอัตโนมัติ</span></div>`;
+          if (removeBtn) removeBtn.style.display = "none";
+        }
+      }
+
+      async function handleProfilePhoto(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+          pendingPhoto = await compressImage(file, 300, 0.75);
+          _refreshPhotoPreview();
+          showToast("📷 เลือกรูปแล้ว กด บันทึก เพื่อยืนยัน");
+        } catch (err) {
+          showToast("⚠️ โหลดรูปไม่ได้");
+        }
+      }
+
+      function removeProfilePhoto() {
+        pendingPhoto = null;
+        document.getElementById("profile-file-input").value = "";
+        _refreshPhotoPreview();
+        showToast("🗑️ ลบรูปแล้ว");
+      }
       function saveProfile() {
         const name = document.getElementById("edit-name").value.trim();
         if (!name) {
@@ -2611,15 +2564,11 @@ function doGet(e) {
           return;
         }
         db.users[currentUser].name = name;
-
-        if (selectedAvatarBase64) {
-          db.users[currentUser].avatar = selectedAvatarBase64;
-          db.users[currentUser].emoji = "😊";
-        } else if (selectedEmoji) {
-          db.users[currentUser].emoji = selectedEmoji;
-          db.users[currentUser].avatar = null;
-        }
-
+        db.users[currentUser].emoji =
+          selectedEmoji || db.users[currentUser].emoji;
+        // pendingPhoto: null = remove, string = set, undefined = keep (won't happen since we always set)
+        if (pendingPhoto !== undefined)
+          db.users[currentUser].photo = pendingPhoto || null;
         saveAndSync();
         closeModal("modal-edit-profile");
         renderDash();
@@ -2627,7 +2576,7 @@ function doGet(e) {
         showToast("✅ อัปเดตโปรไฟล์แล้ว!");
       }
 
-      // Split functions (same as before)
+      // ── Split ─────────────────────────────────────────────────────
       function openSplit(fromDash) {
         splitFromDash = !!fromDash;
         splitPayer = null;
@@ -2656,13 +2605,9 @@ function doGet(e) {
         ml.innerHTML = "";
         Object.values(db.users).forEach((u) => {
           const pSel = splitPayer === u.id;
-          const avatarHtml =
-            u.avatar && u.avatar.startsWith("data:image")
-              ? `<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover;">`
-              : `<span style="font-size:1.2rem;">${u.emoji}</span>`;
           const pd = document.createElement("div");
           pd.className = `checkbox-item ${pSel ? "selected" : ""}`;
-          pd.innerHTML = `<div class="checkbox-box">${pSel ? "✓" : ""}</div><div class="checkbox-avatar">${avatarHtml}</div><div class="checkbox-name">${u.name}</div>`;
+          pd.innerHTML = `<div class="checkbox-box">${pSel ? "✓" : ""}</div><div class="checkbox-avatar">${u.emoji}</div><div class="checkbox-name">${u.name}</div>`;
           pd.onclick = () => {
             splitPayer = u.id;
             renderSplitLists();
@@ -2673,7 +2618,7 @@ function doGet(e) {
           const mSel = splitPeople.includes(u.id);
           const md = document.createElement("div");
           md.className = `checkbox-item ${mSel ? "selected" : ""}`;
-          md.innerHTML = `<div class="checkbox-box">${mSel ? "✓" : ""}</div><div class="checkbox-avatar">${avatarHtml}</div><div class="checkbox-name">${u.name}</div>`;
+          md.innerHTML = `<div class="checkbox-box">${mSel ? "✓" : ""}</div><div class="checkbox-avatar">${u.emoji}</div><div class="checkbox-name">${u.name}</div>`;
           md.onclick = () => {
             if (splitPeople.includes(u.id))
               splitPeople = splitPeople.filter((x) => x !== u.id);
@@ -2747,7 +2692,7 @@ function doGet(e) {
         }
       }
 
-      // Modal Utils
+      // ── Modal Utils ───────────────────────────────────────────────
       function openModal(id) {
         document.getElementById(id).classList.add("open");
       }
@@ -2760,9 +2705,281 @@ function doGet(e) {
         });
       });
 
-      // Init
+      // ── Setup: User Management ───────────────────────────────────
+      const USER_COLORS = [
+        "#c83dff",
+        "#00c6ff",
+        "#5aff8a",
+        "#6ad3ff",
+        "#ffd060",
+        "#ff5a7a",
+        "#ff914d",
+        "#a8ff78",
+        "#7c6aff",
+        "#ff6a9e",
+        "#00e5cc",
+        "#f9ca24",
+      ];
+      let newUserEmoji = "😎";
+      let newUserColor = "#7c6aff";
+      let delUserId = null;
+      let logFilter = "all";
+
+      function renderSetupScreen() {
+        renderSetupUserList();
+        renderActivityLog();
+        // fill setup url if exists
+        const urlInput = document.getElementById("setup-url");
+        if (urlInput && scriptUrl) urlInput.value = scriptUrl;
+      }
+
+      function renderSetupUserList() {
+        const list = document.getElementById("setup-user-list");
+        if (!list) return;
+        list.innerHTML = "";
+        Object.values(db.users).forEach((u) => {
+          const owe = Object.values(db.debts[u.id] || {}).reduce(
+            (a, b) => a + b,
+            0,
+          );
+          const owed = Object.keys(db.users)
+            .filter((k) => k !== u.id)
+            .reduce((a, k) => a + getDebt(k, u.id), 0);
+          const row = document.createElement("div");
+          row.className = "user-manage-row";
+          const manAvHTML = u.photo
+            ? `<img src="${u.photo}" style="width:36px;height:36px;object-fit:cover;border-radius:50%;" alt="${u.name}">`
+            : u.emoji;
+          row.innerHTML = `
+      <div class="user-manage-avatar" style="overflow:hidden;">${manAvHTML}</div>
+      <div class="user-manage-info">
+        <div class="user-manage-name">${u.name}</div>
+        <div class="user-manage-sub">หนี้: ${fmt(owe)} | ลูกหนี้: ${fmt(owed)}</div>
+      </div>
+      <button class="user-manage-del" onclick="openDelUserModal('${u.id}')">🗑️ ลบ</button>`;
+          list.appendChild(row);
+        });
+      }
+
+      function openAddUserModal() {
+        newUserEmoji = "😎";
+        newUserColor = "#7c6aff";
+        newUserPendingPhoto = null;
+        document.getElementById("new-user-name").value = "";
+        document.getElementById("new-user-file-input").value = "";
+        const wrap = document.getElementById("new-user-photo-preview-wrap");
+        if (wrap)
+          wrap.innerHTML = `<div style="font-size:2.5rem;margin-bottom:6px;">📷</div>
+    <div class="upload-label" style="font-size:.78rem;">แตะเพื่อเลือกรูป (ไม่บังคับ)</div>`;
+
+        // emoji grid
+        const eg = document.getElementById("new-user-emoji-grid");
+        eg.innerHTML = "";
+        EMOJIS.forEach((em) => {
+          const d = document.createElement("div");
+          d.className = `emoji-opt ${em === newUserEmoji ? "selected" : ""}`;
+          d.textContent = em;
+          d.onclick = () => {
+            newUserEmoji = em;
+            eg.querySelectorAll(".emoji-opt").forEach((x) =>
+              x.classList.remove("selected"),
+            );
+            d.classList.add("selected");
+          };
+          eg.appendChild(d);
+        });
+
+        // color grid
+        const cg = document.getElementById("new-user-color-grid");
+        cg.innerHTML = "";
+        USER_COLORS.forEach((col) => {
+          const d = document.createElement("div");
+          d.className = `color-dot ${col === newUserColor ? "selected" : ""}`;
+          d.style.background = col;
+          d.onclick = () => {
+            newUserColor = col;
+            cg.querySelectorAll(".color-dot").forEach((x) =>
+              x.classList.remove("selected"),
+            );
+            d.classList.add("selected");
+          };
+          cg.appendChild(d);
+        });
+        openModal("modal-add-user");
+      }
+
+      async function handleNewUserPhoto(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+          newUserPendingPhoto = await compressImage(file, 300, 0.75);
+          const wrap = document.getElementById("new-user-photo-preview-wrap");
+          if (wrap)
+            wrap.innerHTML = `<img src="${newUserPendingPhoto}" class="upload-preview" alt="preview">
+      <div class="upload-label" style="font-size:.75rem;">แตะเพื่อเปลี่ยนรูป</div>`;
+          showToast("📷 เลือกรูปแล้ว");
+        } catch (err) {
+          showToast("⚠️ โหลดรูปไม่ได้");
+        }
+      }
+
+      function confirmAddUser() {
+        const name = document.getElementById("new-user-name").value.trim();
+        if (!name) {
+          showToast("⚠️ ใส่ชื่อด้วย");
+          return;
+        }
+        // generate id from name (slugify)
+        let id =
+          name
+            .toLowerCase()
+            .replace(/[^a-z0-9ก-๙]/g, "")
+            .substring(0, 12) || "user" + Date.now();
+        if (db.users[id]) id = id + Date.now(); // dedupe
+        db.users[id] = {
+          id,
+          name,
+          emoji: newUserEmoji,
+          color: newUserColor,
+          photo: newUserPendingPhoto || null,
+        };
+        db.debts[id] = {};
+        // log
+        db.history.push({
+          id: newId(),
+          type: "user-add",
+          userId: id,
+          note: `เพิ่มผู้ใช้ "${name}"`,
+          ts: Date.now(),
+        });
+        saveAndSync();
+        closeModal("modal-add-user");
+        renderSetupUserList();
+        renderActivityLog();
+        renderSelect();
+        showToast(`✅ เพิ่ม ${name} แล้ว!`);
+      }
+
+      function openDelUserModal(uid) {
+        delUserId = uid;
+        const u = db.users[uid];
+        const owe = Object.values(db.debts[uid] || {}).reduce(
+          (a, b) => a + b,
+          0,
+        );
+        const owed = Object.keys(db.users)
+          .filter((k) => k !== uid)
+          .reduce((a, k) => a + getDebt(k, uid), 0);
+        document.getElementById("del-user-info").innerHTML =
+          `<b>${u.emoji} ${u.name}</b><br>มีหนี้ค้างอยู่: ${fmt(owe)} · มีลูกหนี้: ${fmt(owed)}`;
+        openModal("modal-del-user");
+      }
+
+      function confirmDelUser() {
+        if (!delUserId) return;
+        const u = db.users[delUserId];
+        // log before delete
+        db.history.push({
+          id: newId(),
+          type: "user-del",
+          userId: delUserId,
+          note: `ลบผู้ใช้ "${u.name}"`,
+          ts: Date.now(),
+        });
+        // remove from users
+        delete db.users[delUserId];
+        // remove their debts
+        delete db.debts[delUserId];
+        // remove debts pointing to them
+        Object.keys(db.debts).forEach((k) => {
+          if (db.debts[k]) delete db.debts[k][delUserId];
+        });
+        // remove history entries for them (optional: keep for audit)
+        // keep history — just orphaned entries will still show in log
+        saveAndSync();
+        closeModal("modal-del-user");
+        renderSetupUserList();
+        renderActivityLog();
+        renderSelect();
+        showToast(`🗑️ ลบ ${u.name} แล้ว`);
+        delUserId = null;
+      }
+
+      // ── Activity Log ──────────────────────────────────────────────
+      function renderActivityLog() {
+        const list = document.getElementById("activity-log-list");
+        if (!list) return;
+        list.innerHTML = "";
+        const all = [...db.history].sort((a, b) => b.ts - a.ts);
+        const filtered =
+          logFilter === "all" ? all : all.filter((h) => h.type === logFilter);
+        if (!filtered.length) {
+          list.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:16px;font-size:.85rem;">ไม่มีรายการ</div>`;
+          return;
+        }
+        filtered.slice(0, 60).forEach((h) => {
+          const d = document.createElement("div");
+          d.className = "log-item";
+          let icon = "📝",
+            iconCls = "add",
+            amtHtml = "",
+            noteHtml = "";
+          const fU = db.users[h.from] || { name: h.from || "?", emoji: "👤" };
+          const tU = db.users[h.to] || { name: h.to || "?", emoji: "👤" };
+          if (h.type === "pay") {
+            icon = "💸";
+            iconCls = "pay";
+            noteHtml = `${fU.emoji} <b>${fU.name}</b> จ่ายหนี้ ${tU.emoji} <b>${tU.name}</b>${h.note ? " · " + h.note : ""}${h.method ? " (" + (h.method === "transfer" ? "อัพสลีฟ" : "เงินสด") + ")" : ""}`;
+            amtHtml = `<div class="log-amount pay">-${fmt(h.amount)}</div>`;
+          } else if (h.type === "add") {
+            icon = "➕";
+            iconCls = "add";
+            noteHtml = `${fU.emoji} <b>${fU.name}</b> เป็นหนี้เพิ่ม ${tU.emoji} <b>${tU.name}</b>${h.note ? " · " + h.note : ""}`;
+            amtHtml = `<div class="log-amount add">+${fmt(h.amount)}</div>`;
+          } else if (h.type === "split") {
+            icon = "🍻";
+            iconCls = "split";
+            noteHtml = `${fU.emoji} <b>${fU.name}</b> หารบิลกับ ${tU.emoji} <b>${tU.name}</b>${h.note ? " · " + h.note : ""}`;
+            amtHtml = `<div class="log-amount add">+${fmt(h.amount)}</div>`;
+          } else if (h.type === "user-add") {
+            icon = "👤";
+            iconCls = "user-add";
+            noteHtml = `<b>${h.note || "เพิ่มผู้ใช้"}</b>`;
+            amtHtml = `<div class="log-amount neutral">👋</div>`;
+          } else if (h.type === "user-del") {
+            icon = "🗑️";
+            iconCls = "user-del";
+            noteHtml = `<b>${h.note || "ลบผู้ใช้"}</b>`;
+            amtHtml = `<div class="log-amount neutral">❌</div>`;
+          }
+          d.innerHTML = `
+      <div class="log-icon ${iconCls}">${icon}</div>
+      <div class="log-info">
+        <div class="log-note">${noteHtml}</div>
+        <div class="log-date">${thaiDate(h.ts)}</div>
+      </div>
+      ${amtHtml}`;
+          list.appendChild(d);
+        });
+        if (filtered.length > 60) {
+          list.insertAdjacentHTML(
+            "beforeend",
+            `<div style="text-align:center;color:var(--text-muted);padding:12px;font-size:.78rem;">แสดง 60 รายการล่าสุด (ทั้งหมด ${filtered.length})</div>`,
+          );
+        }
+      }
+
+      function filterLog(type) {
+        logFilter = type;
+        ["all", "pay", "add", "split"].forEach((t) => {
+          const btn = document.getElementById("log-filter-" + t);
+          if (btn) btn.classList.toggle("active", t === type);
+        });
+        renderActivityLog();
+      }
+
+      // ── Init ──────────────────────────────────────────────────────
       loadLocal();
-      renderUserManageList();
       renderSelect();
       showScreen("screen-select");
       if (scriptUrl) syncPull();
