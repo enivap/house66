@@ -7,6 +7,12 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
     />
     <title>HOUSE66 Dept💸</title>
+    <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+      import { getDatabase, ref, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+      window.__firebase = { initializeApp, getDatabase, ref, set, onValue, serverTimestamp };
+    </script>
     <link rel="icon" href="house66.png?v=2" />
 
 <link rel="apple-touch-icon" href="house66.png">
@@ -1128,64 +1134,56 @@
     <div id="app">
       <!-- SETUP -->
       <div id="screen-setup" class="screen">
-        <div class="setup-logo">🔧</div>
-        <div class="setup-title">ตั้งค่า Sync</div>
+        <div class="setup-logo">🔥</div>
+        <div class="setup-title">ตั้งค่า Firebase</div>
         <div class="setup-sub">
-          เชื่อมต่อ Google Sheets เพื่อแชร์ข้อมูลทุกคน<br />ข้ามได้ถ้าอยากใช้แบบ
-          Offline ก่อน
+          เชื่อมต่อ Firebase Realtime Database<br/>เพื่อ sync ทันทีทุกเครื่อง ไม่ต้องรีเฟรช
         </div>
         <div class="setup-card">
-          <h3>📋 Apps Script Code</h3>
-          <div class="script-box" id="script-code-box"></div>
-          <button
-            class="btn btn-secondary btn-full"
-            onclick="copyScript()"
-            style="margin-bottom: 0; font-size: 0.85rem"
-          >
-            📋 คัดลอกโค้ด
-          </button>
-        </div>
-        <div class="setup-card">
-          <h3>🚀 วิธี Deploy</h3>
+          <h3>🚀 วิธีสร้าง Firebase</h3>
           <div class="setup-step">
             <div class="step-num">1</div>
-            <div class="step-text">
-              เปิด Google Sheets ใหม่ → <b>Extensions → Apps Script</b>
-            </div>
+            <div class="step-text">ไปที่ <b>console.firebase.google.com</b> → สร้าง Project ใหม่ (ฟรี)</div>
           </div>
           <div class="setup-step">
             <div class="step-num">2</div>
-            <div class="step-text">ลบโค้ดเดิม วางโค้ดด้านบน กด <b>Save</b></div>
+            <div class="step-text"><b>Build → Realtime Database → Create database</b><br/>เลือก <b>Start in test mode</b></div>
           </div>
           <div class="setup-step">
             <div class="step-num">3</div>
-            <div class="step-text">
-              <b>Deploy → New deployment → Web app</b><br />Execute as:
-              <b>Me</b> · Access: <b>Anyone</b>
-            </div>
+            <div class="step-text"><b>Project Settings ⚙️ → General → Your apps</b><br/>คลิก <b>&lt;/&gt; Web</b> → Register app → เอา config มาวางด้านล่าง</div>
           </div>
           <div class="setup-step">
             <div class="step-num">4</div>
-            <div class="step-text">
-              คัดลอก <b>Deployment URL</b> มาวางด้านล่าง
-            </div>
+            <div class="step-text">วาง <b>firebaseConfig</b> ทั้งก้อน (JSON) ในช่องด้านล่าง</div>
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Deployment URL</label>
+          <label class="form-label">Firebase Config (JSON)</label>
+          <textarea
+            class="form-input"
+            id="setup-firebase-config"
+            rows="7"
+            placeholder='{&#10;  "apiKey": "...",&#10;  "authDomain": "...",&#10;  "databaseURL": "...",&#10;  "projectId": "..."&#10;}'
+            style="font-size: 0.72rem; font-family: monospace; resize: none;"
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Room Key (ชื่อห้อง — ใช้ร่วมกันทุกคน)</label>
           <input
             class="form-input"
-            id="setup-url"
-            placeholder="https://script.google.com/macros/s/..."
-            style="font-size: 0.78rem"
+            id="setup-room-key"
+            placeholder="house66"
+            style="font-size: 0.9rem"
           />
+          <div style="font-size:.72rem;color:var(--text-muted);margin-top:5px;">ทุกคนในบ้านต้องใช้ Room Key เดียวกัน</div>
         </div>
         <div style="display: flex; gap: 10px; margin-bottom: 20px">
           <button class="btn btn-secondary" onclick="skipSetup()">
             ข้ามก่อน
           </button>
           <button class="btn btn-primary" onclick="saveSetup()">
-            🔗 เชื่อมต่อ
+            🔥 เชื่อมต่อ Firebase
           </button>
         </div>
 
@@ -1270,6 +1268,7 @@
           <div class="sync-status" id="sync-status" onclick="manualSync()">
             <div class="sync-dot" id="sync-dot"></div>
             <span id="sync-label">ไม่ได้เชื่อมต่อ</span>
+            <span id="sync-live-badge" style="display:none;font-size:.65rem;background:rgba(42,255,168,.15);color:var(--green);border:1px solid rgba(42,255,168,.3);border-radius:50px;padding:1px 7px;margin-left:2px;">LIVE</span>
           </div>
         </div>
         <div class="user-grid" id="user-grid"></div>
@@ -1737,60 +1736,54 @@
     <div class="toast" id="toast"></div>
 
     <script>
-      // ── Apps Script code template ─────────────────────────────────
-      const APPS_SCRIPT_CODE = `const SHEET_NAME = 'DebtDB';
+      // ── Firebase ─────────────────────────────────────────────────
+      let firebaseApp = null, firebaseDB = null, firebaseRef = null, fbUnsub = null;
+      let roomKey = "house66";
 
-function doPost(e) {
-  try {
-    const data = JSON.parse(e.postData.contents);
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    let sheet = ss.getSheetByName(SHEET_NAME);
-    if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
-    sheet.clearContents();
-    sheet.getRange(1, 1).setValue(JSON.stringify(data));
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: true }))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: false, error: err.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
+      async function initFirebase(config, room) {
+        try {
+          const { initializeApp, getDatabase, ref, set, onValue } = window.__firebase;
+          // If already initialized with same config, just update ref
+          if (!firebaseApp) {
+            firebaseApp = initializeApp(config, "debtapp-" + Date.now());
+          }
+          firebaseDB = getDatabase(firebaseApp);
+          roomKey = room || "house66";
+          firebaseRef = ref(firebaseDB, "rooms/" + roomKey + "/db");
 
-function doGet(e) {
-  try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName(SHEET_NAME);
-    if (!sheet || sheet.getLastRow() === 0) {
-      return ContentService
-        .createTextOutput(JSON.stringify({ ok: true, data: null }))
-        .setMimeType(ContentService.MimeType.JSON);
-    }
-    const raw = sheet.getRange(1, 1).getValue();
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: true, data: JSON.parse(raw) }))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: false, error: err.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}`;
-
-      document.getElementById("script-code-box").textContent = APPS_SCRIPT_CODE;
-
-      function copyScript() {
-        navigator.clipboard
-          .writeText(APPS_SCRIPT_CODE)
-          .then(() => showToast("📋 คัดลอกแล้ว!"))
-          .catch(() => {
-            const r = document.createRange();
-            r.selectNode(document.getElementById("script-code-box"));
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(r);
-            showToast("📋 เลือกข้อความแล้ว — กด Copy");
+          // Start listening for real-time changes
+          if (fbUnsub) fbUnsub();
+          fbUnsub = onValue(firebaseRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+              // Merge: don't overwrite if we just pushed (debounce by ts)
+              db = data;
+              saveLocal();
+              renderSelect();
+              if (currentUser && document.getElementById("screen-dashboard").classList.contains("active")) renderDash();
+              if (currentDetail && document.getElementById("screen-detail").classList.contains("active")) renderDetail();
+              setSyncUI("ok", "✅ เชื่อมต่อแล้ว", true);
+            }
+          }, (err) => {
+            setSyncUI("err", "❌ " + err.code, false);
           });
+          setSyncUI("ok", "✅ เชื่อมต่อแล้ว", true);
+          return true;
+        } catch (e) {
+          setSyncUI("err", "❌ Config ผิด", false);
+          console.error(e);
+          return false;
+        }
+      }
+
+      async function fbPush() {
+        if (!firebaseRef) return;
+        try {
+          const { ref, set } = window.__firebase;
+          await set(firebaseRef, db);
+        } catch(e) {
+          setSyncUI("err", "❌ Push ไม่ได้", false);
+        }
       }
 
       // ── State ─────────────────────────────────────────────────────
@@ -1829,117 +1822,16 @@ function doGet(e) {
           ice: { id: "ice", name: "ไอซ์", emoji: "😇", color: "#6ad3ff" },
         },
         debts: {
-          ern: { ice: 0, kung: 0 },
-          pp: { ice: 0, kung: 0, ern: 0 },
+          pp: {},
+          ern: {},
           kung: {},
           ice: {},
         },
-        history: [
-          {
-            id: 1,
-            from: "ern",
-            to: "ice",
-            type: "add",
-            amount: 0,
-            note: "หนี้เก่า",
-            ts: +new Date("2024-11-01T10:00:00+07:00"),
-          },
-          {
-            id: 2,
-            from: "ern",
-            to: "ice",
-            type: "add",
-            amount: 0,
-            note: "",
-            ts: +new Date("2024-11-10T14:30:00+07:00"),
-          },
-          {
-            id: 3,
-            from: "pp",
-            to: "ice",
-            type: "add",
-            amount: 0,
-            note: "",
-            ts: +new Date("2024-11-02T09:00:00+07:00"),
-          },
-          {
-            id: 4,
-            from: "pp",
-            to: "ice",
-            type: "add",
-            amount: 0,
-            note: "",
-            ts: +new Date("2024-11-05T12:00:00+07:00"),
-          },
-          {
-            id: 5,
-            from: "pp",
-            to: "ice",
-            type: "add",
-            amount: 0,
-            note: "",
-            ts: +new Date("2024-11-08T11:00:00+07:00"),
-          },
-          {
-            id: 6,
-            from: "pp",
-            to: "ice",
-            type: "pay",
-            amount: 0,
-            note: "จ่ายคืนบางส่วน",
-            method: "cash",
-            ts: +new Date("2024-11-15T16:00:00+07:00"),
-          },
-          {
-            id: 7,
-            from: "ern",
-            to: "kung",
-            type: "add",
-            amount: 0,
-            note: "",
-            ts: +new Date("2024-11-01T10:00:00+07:00"),
-          },
-          {
-            id: 8,
-            from: "ern",
-            to: "kung",
-            type: "add",
-            amount: 0,
-            note: "",
-            ts: +new Date("2024-11-03T13:00:00+07:00"),
-          },
-          {
-            id: 9,
-            from: "ern",
-            to: "kung",
-            type: "add",
-            amount: 0,
-            note: "",
-            ts: +new Date("2024-11-12T15:00:00+07:00"),
-          },
-          {
-            id: 10,
-            from: "pp",
-            to: "kung",
-            type: "add",
-            amount: 0,
-            note: "",
-            ts: +new Date("2024-11-01T10:00:00+07:00"),
-          },
-          {
-            id: 11,
-            from: "pp",
-            to: "ern",
-            type: "add",
-            amount: 0,
-            note: "",
-            ts: +new Date("2024-11-07T18:00:00+07:00"),
-          },
-        ],
+        history: [],
       };
 
       let db = JSON.parse(JSON.stringify(DEFAULT_DB));
-      let scriptUrl = "";
+      let firebaseConfig = null;
       let currentUser = null;
       let currentDetail = null; // { from, to }
       let payMethod = "cash";
@@ -1949,6 +1841,8 @@ function doGet(e) {
       let selectedDebtor = null;
       let splitFromDash = false;
 
+      const DB_VERSION = "v2";
+
       function ls(k, v) {
         try {
           if (v === undefined) return localStorage.getItem(k);
@@ -1957,92 +1851,79 @@ function doGet(e) {
           return null;
         }
       }
+
+      // ล้าง localStorage ถ้า version เปลี่ยน
+      if (ls("debt_db_version") !== DB_VERSION) {
+        localStorage.removeItem("debt_db");
+        ls("debt_db_version", DB_VERSION);
+      }
       function saveLocal() {
         ls("debt_db", JSON.stringify(db));
       }
       function loadLocal() {
         const s = ls("debt_db");
         if (s) {
-          try {
-            db = JSON.parse(s);
-          } catch (e) {}
+          try { db = JSON.parse(s); } catch (e) {}
         }
-        scriptUrl = ls("debt_script_url") || "";
+        const fc = ls("debt_firebase_config");
+        const rk = ls("debt_room_key");
+        if (fc) {
+          try {
+            firebaseConfig = JSON.parse(fc);
+            roomKey = rk || "house66";
+          } catch(e) {}
+        }
       }
 
-      // ── Sync ──────────────────────────────────────────────────────
-      function setSyncUI(state, label) {
+      // ── Sync UI ───────────────────────────────────────────────────
+      function setSyncUI(state, label, live) {
         const dot = document.getElementById("sync-dot");
         const lbl = document.getElementById("sync-label");
+        const badge = document.getElementById("sync-live-badge");
         if (!dot || !lbl) return;
-        dot.className =
-          "sync-dot" + (state === "ok" ? " ok" : state === "err" ? " err" : "");
+        dot.className = "sync-dot" + (state === "ok" ? " ok" : state === "err" ? " err" : "");
         lbl.textContent = label;
+        if (badge) badge.style.display = live ? "" : "none";
       }
 
-      async function syncPush() {
-        if (!scriptUrl) return;
-        try {
-          await fetch(scriptUrl, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(db),
-          });
-          setSyncUI("ok", "✅ ซิงค์แล้ว");
-        } catch (e) {
-          setSyncUI("err", "❌ Push ไม่ได้");
-        }
-      }
-
-      async function syncPull() {
-        if (!scriptUrl) {
-          setSyncUI("off", "ไม่ได้เชื่อมต่อ");
+      function manualSync() {
+        if (!firebaseRef) {
+          showToast("⚙️ ตั้งค่า Firebase ก่อน");
+          showScreen("screen-setup");
           return;
         }
-        setSyncUI("", "⟳ กำลังดึงข้อมูล...");
-        try {
-          const res = await fetch(scriptUrl + "?t=" + Date.now());
-          const json = await res.json();
-          if (json.ok && json.data) {
-            db = json.data;
-            saveLocal();
-            renderSelect();
-            setSyncUI("ok", "✅ ดึงข้อมูลแล้ว");
-          } else setSyncUI("ok", "✅ เชื่อมต่อแล้ว");
-        } catch (e) {
-          setSyncUI("err", "⚠️ ดึงข้อมูลไม่ได้");
-        }
-      }
-
-      async function manualSync() {
-        if (!scriptUrl) {
-          showToast("⚙️ ตั้งค่า URL ก่อน");
-          return;
-        }
-        await syncPull();
-        await syncPush();
+        fbPush().then(() => showToast("🔄 Push แล้ว!"));
       }
 
       function saveAndSync() {
         saveLocal();
-        syncPush();
+        fbPush();
       }
 
-      // ── Setup ─────────────────────────────────────────────────────
-      function saveSetup() {
-        const url = document.getElementById("setup-url").value.trim();
-        if (!url.startsWith("https://script.google.com")) {
-          showToast("⚠️ URL ไม่ถูกต้อง");
+      async function saveSetup() {
+        const raw = document.getElementById("setup-firebase-config").value.trim();
+        const room = (document.getElementById("setup-room-key").value.trim() || "house66").replace(/[^a-z0-9_-]/gi, "");
+        let config;
+        try {
+          config = JSON.parse(raw);
+        } catch(e) {
+          showToast("⚠️ JSON ไม่ถูกต้อง ลองก็อปปี้ใหม่");
           return;
         }
-        scriptUrl = url;
-        ls("debt_script_url", url);
-        showToast("🔗 บันทึก URL แล้ว กำลังทดสอบ...");
-        syncPull().then(() => {
+        if (!config.databaseURL) {
+          showToast("⚠️ ต้องมี databaseURL ใน config");
+          return;
+        }
+        showToast("🔥 กำลังเชื่อมต่อ...");
+        firebaseConfig = config;
+        ls("debt_firebase_config", JSON.stringify(config));
+        ls("debt_room_key", room);
+        const ok = await initFirebase(config, room);
+        if (ok) {
+          showToast("✅ เชื่อมต่อ Firebase แล้ว!");
           showScreen("screen-select");
           renderSelect();
-        });
+        }
       }
       function skipSetup() {
         showScreen("screen-select");
@@ -2142,8 +2023,9 @@ function doGet(e) {
         const grid = document.getElementById("user-grid");
         grid.innerHTML = "";
         setSyncUI(
-          scriptUrl ? "ok" : "off",
-          scriptUrl ? "✅ เชื่อมต่อแล้ว" : "ไม่ได้เชื่อมต่อ",
+          firebaseRef ? "ok" : "off",
+          firebaseRef ? "✅ เชื่อมต่อแล้ว" : "ไม่ได้เชื่อมต่อ",
+          !!firebaseRef
         );
         Object.values(db.users).forEach((u, i) => {
           const owe = Object.values(db.debts[u.id] || {}).reduce(
@@ -2734,9 +2616,10 @@ function doGet(e) {
       function renderSetupScreen() {
         renderSetupUserList();
         renderActivityLog();
-        // fill setup url if exists
-        const urlInput = document.getElementById("setup-url");
-        if (urlInput && scriptUrl) urlInput.value = scriptUrl;
+        const cfgInput = document.getElementById("setup-firebase-config");
+        if (cfgInput && firebaseConfig) cfgInput.value = JSON.stringify(firebaseConfig, null, 2);
+        const rkInput = document.getElementById("setup-room-key");
+        if (rkInput) rkInput.value = roomKey || "house66";
       }
 
       function renderSetupUserList() {
@@ -2988,7 +2871,11 @@ function doGet(e) {
       loadLocal();
       renderSelect();
       showScreen("screen-select");
-      if (scriptUrl) syncPull();
+      if (firebaseConfig) {
+        initFirebase(firebaseConfig, roomKey);
+      } else {
+        setSyncUI("off", "ไม่ได้เชื่อมต่อ", false);
+      }
     </script>
   </body>
 </html>
