@@ -4,912 +4,230 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes"
     />
-    <title>HOUSE66 Dept💸</title>
+    <title>HOUSE66 Dept💸 - แอปจดหนี้กันเอง</title>
     <!-- Firebase SDK -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-      import { getDatabase, ref, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-      window.__firebase = { initializeApp, getDatabase, ref, set, onValue, serverTimestamp };
+      import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+      window.__firebase = { initializeApp, getDatabase, ref, set, onValue };
     </script>
-    <link rel="icon" href="house66.png?v=2" />
-
-<link rel="apple-touch-icon" href="house66.png">
-<link rel="apple-touch-icon" sizes="180x180" href="house66.png">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="HOUSE66">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
     <link
       href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;900&family=Sarabun:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
     <style>
-      :root {
-        --bg: #0a0a0f;
-        --surface: #12121a;
-        --surface2: #1a1a26;
-        --border: rgba(255, 255, 255, 0.08);
-        --text: #f0f0ff;
-        --text-muted: rgba(240, 240, 255, 0.45);
-        --accent: #7c6aff;
-        --green: #2affa8;
-        --red: #ff5a7a;
-        --yellow: #ffd060;
-        --radius: 20px;
-        --radius-sm: 12px;
-      }
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
         -webkit-tap-highlight-color: transparent;
       }
-      html,
       body {
-        height: 100%;
-        overflow: hidden;
-      }
-      body {
-        font-family: "Kanit", sans-serif;
-        background: var(--bg);
-        color: var(--text);
+        font-family: 'Kanit', 'Sarabun', sans-serif;
+        background: #0a0a0f;
+        color: #f0f0ff;
         display: flex;
         justify-content: center;
         align-items: center;
+        min-height: 100vh;
       }
       #app {
         width: 100%;
         max-width: 430px;
-        height: 100dvh;
-        overflow: hidden;
+        min-height: 100vh;
+        background: #0a0a0f;
         position: relative;
-        background: var(--bg);
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
       }
       .screen {
-        position: absolute;
-        inset: 0;
-        overflow-y: auto;
-        overflow-x: hidden;
-        opacity: 0;
-        pointer-events: none;
-        transition:
-          opacity 0.35s ease,
-          transform 0.35s ease;
-        transform: translateY(20px);
-        padding-bottom: 40px;
+        display: none;
+        padding: 20px 18px 30px;
+        animation: fadeIn 0.3s ease;
       }
       .screen.active {
-        opacity: 1;
-        pointer-events: all;
-        transform: translateY(0);
+        display: block;
       }
-      .screen::-webkit-scrollbar {
-        width: 3px;
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
       }
-      .screen::-webkit-scrollbar-thumb {
-        background: var(--accent);
-        border-radius: 10px;
-      }
-
-      /* SETUP */
-      #screen-setup {
-        padding: 40px 24px;
-        display: flex;
-        flex-direction: column;
-      }
-      .setup-logo {
-        font-size: 3rem;
-        text-align: center;
-        margin-bottom: 12px;
-      }
-      .setup-title {
-        font-size: 1.8rem;
-        font-weight: 900;
-        text-align: center;
-        margin-bottom: 6px;
-      }
-      .setup-sub {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        text-align: center;
-        margin-bottom: 28px;
-        line-height: 1.6;
-      }
-      .setup-card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
+      /* Cards & Components */
+      .card {
+        background: rgba(18, 18, 26, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
         padding: 18px;
-        margin-bottom: 14px;
+        margin-bottom: 16px;
+        border: 1px solid rgba(255,255,255,0.08);
       }
-      .setup-card h3 {
-        font-size: 0.8rem;
-        font-weight: 700;
-        margin-bottom: 12px;
-        color: var(--accent);
-        letter-spacing: 1px;
-        text-transform: uppercase;
-      }
-      .setup-step {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 8px;
-        align-items: flex-start;
-      }
-      .step-num {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: var(--accent);
-        font-size: 0.65rem;
-        font-weight: 800;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        margin-top: 2px;
-      }
-      .step-text {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        line-height: 1.6;
-      }
-      .step-text b {
-        color: var(--text);
-      }
-      .script-box {
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 10px;
-        font-size: 0.7rem;
-        color: var(--yellow);
-        font-family: monospace;
-        white-space: pre-wrap;
-        word-break: break-all;
-        max-height: 100px;
-        overflow-y: auto;
-        margin-bottom: 10px;
-      }
-
-      /* SELECT */
-      #screen-select {
-        display: flex;
-        flex-direction: column;
-        padding: 0;
-      }
-      .select-header {
-        padding: 58px 26px 22px;
-        position: relative;
-        overflow: hidden;
-      }
-      .select-header::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(
-          ellipse at 50% -20%,
-          rgba(124, 106, 255, 0.3) 0%,
-          transparent 70%
-        );
-        pointer-events: none;
-      }
-      .select-header h1 {
-        font-size: 2.2rem;
-        font-weight: 900;
-        letter-spacing: -0.5px;
-        line-height: 1.1;
-      }
-      .select-header h1 span {
-        color: var(--accent);
-      }
-      .select-header p {
-        color: var(--text-muted);
-        font-size: 0.88rem;
-        margin-top: 5px;
-      }
-      .sync-status {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        margin-top: 10px;
-        font-size: 0.72rem;
-        padding: 4px 12px;
-        border-radius: 50px;
-        border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.04);
+      .btn {
+        font-family: 'Kanit', sans-serif;
+        padding: 12px 20px;
+        border-radius: 60px;
+        border: none;
+        font-weight: 600;
         cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
       }
-      .sync-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--text-muted);
+      .btn-primary {
+        background: linear-gradient(135deg, #7c6aff, #9b8cff);
+        color: white;
+        box-shadow: 0 4px 12px rgba(124,106,255,0.3);
       }
-      .sync-dot.ok {
-        background: var(--green);
+      .btn-primary:active { transform: scale(0.97); opacity: 0.9; }
+      .btn-secondary {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: #f0f0ff;
       }
-      .sync-dot.err {
-        background: var(--red);
+      .btn-danger {
+        background: rgba(255,90,122,0.15);
+        border: 1px solid rgba(255,90,122,0.3);
+        color: #ff5a7a;
+      }
+      .btn-success {
+        background: rgba(42,255,168,0.12);
+        border: 1px solid rgba(42,255,168,0.3);
+        color: #2affa8;
+      }
+      .form-group { margin-bottom: 18px; }
+      .form-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: rgba(240,240,255,0.5);
+        margin-bottom: 6px;
+        display: block;
+      }
+      .form-input, .form-textarea {
+        width: 100%;
+        padding: 14px 16px;
+        background: #12121a;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px;
+        color: #f0f0ff;
+        font-family: 'Kanit', sans-serif;
+        font-size: 1rem;
+        outline: none;
+        transition: all 0.2s;
+      }
+      .form-input:focus, .form-textarea:focus {
+        border-color: #7c6aff;
+        box-shadow: 0 0 0 2px rgba(124,106,255,0.2);
       }
       .user-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 14px;
-        padding: 0 18px 14px;
+        margin: 20px 0;
       }
       .user-card {
-        position: relative;
-        border-radius: 24px;
-        overflow: hidden;
+        background: linear-gradient(135deg, #1a1a26, #14141c);
+        border-radius: 28px;
+        padding: 20px 12px 16px;
+        text-align: center;
         cursor: pointer;
-        aspect-ratio: 0.85;
-        border: 1px solid var(--border);
-        transition: transform 0.2s;
-        background: var(--surface);
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid rgba(255,255,255,0.06);
+        position: relative;
+        overflow: hidden;
       }
-      .user-card:active {
-        transform: scale(0.96);
+      .user-card:active { transform: scale(0.96); }
+      .user-avatar {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 12px;
+        background: rgba(124,106,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.4rem;
+        overflow: hidden;
       }
-      .user-card-bg {
-        position: absolute;
-        inset: 0;
-        opacity: 0.55;
-      }
-      .avatar-img {
+      .user-avatar img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        border-radius: 50%;
       }
-      .upload-zone {
-        border: 2px dashed rgba(124, 106, 255, 0.4);
-        border-radius: var(--radius-sm);
-        padding: 18px;
-        text-align: center;
-        cursor: pointer;
-        transition: border-color 0.2s;
-        position: relative;
-        overflow: hidden;
-      }
-      .upload-zone:hover {
-        border-color: var(--accent);
-      }
-      .upload-zone input[type="file"] {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        cursor: pointer;
-      }
-      .upload-preview {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin: 0 auto 10px;
-        display: block;
-        border: 3px solid var(--accent);
-      }
-      .upload-label {
-        font-size: 0.82rem;
-        color: var(--text-muted);
-      }
-      .user-card-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-          to top,
-          rgba(0, 0, 0, 0.85) 40%,
-          transparent
-        );
-      }
-      .user-card-content {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: 16px 14px;
-      }
-      .user-avatar-circle {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.4rem;
-        margin-bottom: 8px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-      }
-      .user-card-name {
-        font-size: 1.25rem;
+      .user-name {
+        font-size: 1.2rem;
         font-weight: 700;
+        margin-bottom: 4px;
       }
-      .user-card-sub {
-        font-size: 0.75rem;
-        color: rgba(255, 255, 255, 0.6);
-        margin-top: 2px;
-      }
-      .user-card-badge {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 20px;
-        padding: 4px 10px;
-        font-size: 0.7rem;
+      .user-balance {
+        font-size: 0.85rem;
         font-weight: 600;
-      }
-      .badge-red {
-        color: var(--red);
-      }
-      .badge-green {
-        color: var(--green);
-      }
-      .theme-pp .user-card-bg {
-        background: linear-gradient(135deg, #6a3de8, #c83dff, #ff6aae);
-      }
-      .theme-ern .user-card-bg {
-        background: linear-gradient(135deg, #1a6ec7, #00c6ff);
-      }
-      .theme-kung .user-card-bg {
-        background: linear-gradient(135deg, #2d7d46, #5aff8a);
-      }
-      .theme-ice .user-card-bg {
-        background: linear-gradient(135deg, #b05aff, #6ad3ff);
-      }
-      .bottom-actions {
-        padding: 0 18px 10px;
-        display: flex;
-        gap: 10px;
-      }
-
-      /* DASHBOARD */
-      #screen-dashboard {
-        padding: 0;
-      }
-      .dash-header {
-        padding: 50px 22px 22px;
-        position: relative;
-        overflow: hidden;
-      }
-      .dash-header::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(
-          ellipse at 30% 0%,
-          rgba(124, 106, 255, 0.25) 0%,
-          transparent 65%
-        );
-        pointer-events: none;
-      }
-      .back-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid var(--border);
+        padding: 4px 12px;
         border-radius: 50px;
-        padding: 6px 14px 6px 10px;
-        font-size: 0.8rem;
+        display: inline-block;
+      }
+      .positive { background: rgba(42,255,168,0.15); color: #2affa8; }
+      .negative { background: rgba(255,90,122,0.15); color: #ff5a7a; }
+      .debt-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px;
+        background: #12121a;
+        border-radius: 20px;
+        margin-bottom: 10px;
         cursor: pointer;
-        margin-bottom: 18px;
-        color: var(--text);
+        transition: all 0.2s;
       }
-      .back-btn:active {
-        background: rgba(255, 255, 255, 0.14);
-      }
-      .dash-profile {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        margin-bottom: 18px;
-      }
-      .dash-avatar {
-        width: 58px;
-        height: 58px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.8rem;
-        border: 3px solid rgba(255, 255, 255, 0.2);
-        position: relative;
-        cursor: pointer;
-      }
-      .dash-avatar .edit-icon {
-        position: absolute;
-        bottom: -2px;
-        right: -2px;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background: var(--accent);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.65rem;
-        border: 2px solid var(--bg);
-      }
-      .dash-name {
-        font-size: 1.5rem;
-        font-weight: 800;
-      }
+      .debt-item:active { background: #1a1a26; transform: scale(0.98); }
       .stats-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
-        margin: 0 18px 18px;
+        margin: 16px 0;
       }
       .stat-card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 18px 16px;
-        position: relative;
-        overflow: hidden;
-      }
-      .stat-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        opacity: 0.07;
-      }
-      .stat-card.debt-card::before {
-        background: var(--red);
-      }
-      .stat-card.credit-card::before {
-        background: var(--green);
-      }
-      .stat-label {
-        font-size: 0.72rem;
-        color: var(--text-muted);
-        font-weight: 500;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-      }
-      .stat-amount {
-        font-size: 1.45rem;
-        font-weight: 800;
-        margin-top: 6px;
-      }
-      .stat-amount.red {
-        color: var(--red);
-      }
-      .stat-amount.green {
-        color: var(--green);
-      }
-      .stat-icon {
-        font-size: 1.6rem;
-        margin-bottom: 8px;
-      }
-      .section-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 18px;
-        margin-bottom: 10px;
-      }
-      .section-title {
-        font-size: 0.78rem;
-        font-weight: 600;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: var(--text-muted);
-      }
-      .section-add-btn {
-        background: rgba(124, 106, 255, 0.15);
-        border: 1px solid rgba(124, 106, 255, 0.3);
-        color: var(--accent);
-        border-radius: 50px;
-        padding: 5px 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        cursor: pointer;
-        font-family: "Kanit", sans-serif;
-      }
-      .debt-list {
-        padding: 0 16px;
-      }
-      .debt-item {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
+        background: #12121a;
+        border-radius: 24px;
         padding: 16px;
-        margin-bottom: 10px;
-        cursor: pointer;
-        transition: transform 0.15s;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-      }
-      .debt-item:active {
-        transform: scale(0.98);
-      }
-      .debt-item.debt-type {
-        border-left: 3px solid var(--red);
-      }
-      .debt-item.credit-type {
-        border-left: 3px solid var(--green);
-      }
-      .debt-person-avatar {
-        width: 42px;
-        height: 42px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        flex-shrink: 0;
-      }
-      .debt-info {
-        flex: 1;
-      }
-      .debt-person-name {
-        font-size: 1rem;
-        font-weight: 600;
-      }
-      .debt-desc {
-        font-size: 0.75rem;
-        color: var(--text-muted);
-        margin-top: 2px;
-      }
-      .debt-amount {
-        font-size: 1.05rem;
-        font-weight: 700;
-      }
-      .debt-amount.red {
-        color: var(--red);
-      }
-      .debt-amount.green {
-        color: var(--green);
-      }
-      .section-separator {
-        margin: 20px 22px 14px;
-        border: none;
-        border-top: 1px solid var(--border);
-      }
-      .net-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        border-radius: 50px;
-        padding: 5px 14px;
-        font-size: 0.82rem;
-        font-weight: 600;
-        margin-top: 5px;
-      }
-      .net-badge.owe {
-        background: rgba(255, 90, 122, 0.12);
-        color: var(--red);
-        border: 1px solid rgba(255, 90, 122, 0.25);
-      }
-      .net-badge.owed {
-        background: rgba(42, 255, 168, 0.1);
-        color: var(--green);
-        border: 1px solid rgba(42, 255, 168, 0.2);
-      }
-      .net-badge.clear {
-        background: rgba(255, 255, 255, 0.06);
-        color: var(--text-muted);
-        border: 1px solid var(--border);
-      }
-
-      /* DETAIL */
-      #screen-detail {
-        padding: 0;
-      }
-      .detail-header {
-        padding: 50px 22px 26px;
-        border-bottom: 1px solid var(--border);
         text-align: center;
-        position: relative;
-        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.06);
       }
-      .detail-avatar-wrap {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 12px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2.5rem;
-        border: 3px solid rgba(255, 255, 255, 0.2);
-        position: relative;
-        z-index: 1;
-      }
-      .detail-name {
-        font-size: 1.5rem;
-        font-weight: 800;
-        position: relative;
-        z-index: 1;
-      }
-      .detail-amount-big {
-        font-size: 2.4rem;
-        font-weight: 900;
-        margin: 8px 0 4px;
-        letter-spacing: -1px;
-        position: relative;
-        z-index: 1;
-      }
-      .detail-amount-big.red {
-        color: var(--red);
-      }
-      .detail-amount-big.green {
-        color: var(--green);
-      }
-      .detail-direction {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        position: relative;
-        z-index: 1;
-      }
-      .action-btns {
-        display: flex;
-        gap: 10px;
-        padding: 16px 16px 0;
-      }
-      .history-list {
-        padding: 0 16px;
-      }
-      .history-item {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 14px 16px;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-      }
-      .history-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-        flex-shrink: 0;
-        margin-top: 2px;
-      }
-      .history-icon.pay {
-        background: rgba(42, 255, 168, 0.12);
-      }
-      .history-icon.add {
-        background: rgba(255, 90, 122, 0.12);
-      }
-      .history-icon.split {
-        background: rgba(255, 208, 96, 0.12);
-      }
-      .history-info {
-        flex: 1;
-      }
-      .history-note {
-        font-size: 0.9rem;
-        font-weight: 500;
-      }
-      .history-date {
-        font-size: 0.72rem;
-        color: var(--text-muted);
-        margin-top: 3px;
-      }
-      .history-amount {
-        font-size: 1rem;
-        font-weight: 700;
-        white-space: nowrap;
-      }
-      .history-amount.pay {
-        color: var(--green);
-      }
-      .history-amount.add {
-        color: var(--red);
-      }
-
-      /* SPLIT */
-      #screen-split {
-        padding: 0;
-      }
-      .split-header {
-        padding: 50px 22px 24px;
-        background: linear-gradient(
-          135deg,
-          rgba(255, 208, 96, 0.1),
-          transparent 60%
-        );
-        border-bottom: 1px solid var(--border);
-      }
-
-      /* MODAL */
       .modal-overlay {
         position: fixed;
-        inset: 0;
-        z-index: 100;
-        background: rgba(0, 0, 0, 0.75);
-        backdrop-filter: blur(6px);
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(8px);
         display: flex;
         align-items: flex-end;
         justify-content: center;
+        z-index: 1000;
+        visibility: hidden;
         opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s;
+        transition: all 0.3s;
       }
       .modal-overlay.open {
+        visibility: visible;
         opacity: 1;
-        pointer-events: all;
       }
       .modal {
-        background: var(--surface);
-        border-radius: 28px 28px 0 0;
+        background: #12121a;
+        border-radius: 32px 32px 0 0;
         width: 100%;
         max-width: 430px;
-        padding: 22px 22px 40px;
+        padding: 24px 20px 30px;
         transform: translateY(100%);
-        transition: transform 0.35s cubic-bezier(0.22, 0.68, 0, 1.2);
-        border: 1px solid var(--border);
-        border-bottom: none;
-        max-height: 90dvh;
+        transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        max-height: 85vh;
         overflow-y: auto;
+        border-top: 1px solid rgba(255,255,255,0.1);
       }
       .modal-overlay.open .modal {
         transform: translateY(0);
-      }
-      .modal-handle {
-        width: 40px;
-        height: 4px;
-        border-radius: 4px;
-        background: rgba(255, 255, 255, 0.2);
-        margin: 0 auto 18px;
-      }
-      .modal-title {
-        font-size: 1.2rem;
-        font-weight: 700;
-        margin-bottom: 18px;
-      }
-      .form-group {
-        margin-bottom: 14px;
-      }
-      .form-label {
-        font-size: 0.75rem;
-        color: var(--text-muted);
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        margin-bottom: 7px;
-        display: block;
-      }
-      .form-input {
-        width: 100%;
-        padding: 13px 16px;
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        color: var(--text);
-        font-family: "Kanit", sans-serif;
-        font-size: 1rem;
-        outline: none;
-        transition: border-color 0.2s;
-      }
-      .form-input:focus {
-        border-color: var(--accent);
-      }
-      .form-input::placeholder {
-        color: var(--text-muted);
-      }
-      .toggle-group {
-        display: flex;
-        gap: 8px;
-      }
-      .toggle-btn {
-        flex: 1;
-        padding: 12px;
-        border-radius: var(--radius-sm);
-        background: var(--bg);
-        border: 1px solid var(--border);
-        color: var(--text-muted);
-        font-family: "Kanit", sans-serif;
-        font-size: 0.9rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-      .toggle-btn.active {
-        background: var(--accent);
-        border-color: var(--accent);
-        color: #fff;
-      }
-      .checkbox-list {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .checkbox-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 12px 14px;
-        cursor: pointer;
-        transition: border-color 0.2s;
-      }
-      .checkbox-item.selected {
-        border-color: var(--accent);
-        background: rgba(124, 106, 255, 0.08);
-      }
-      .checkbox-box {
-        width: 22px;
-        height: 22px;
-        border-radius: 6px;
-        border: 2px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.75rem;
-        transition: all 0.2s;
-        flex-shrink: 0;
-      }
-      .checkbox-item.selected .checkbox-box {
-        background: var(--accent);
-        border-color: var(--accent);
-        color: #fff;
-      }
-      .checkbox-name {
-        font-size: 0.95rem;
-        font-weight: 500;
-      }
-      .checkbox-avatar {
-        font-size: 1.2rem;
-      }
-      .btn {
-        flex: 1;
-        padding: 14px 10px;
-        border: none;
-        border-radius: var(--radius-sm);
-        font-family: "Kanit", sans-serif;
-        font-size: 0.9rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition:
-          transform 0.15s,
-          opacity 0.15s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-      }
-      .btn:active {
-        transform: scale(0.96);
-        opacity: 0.85;
-      }
-      .btn-primary {
-        background: var(--accent);
-        color: #fff;
-      }
-      .btn-secondary {
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        color: var(--text);
-      }
-      .btn-danger {
-        background: rgba(255, 90, 122, 0.15);
-        border: 1px solid rgba(255, 90, 122, 0.3);
-        color: var(--red);
-      }
-      .btn-success {
-        background: rgba(42, 255, 168, 0.12);
-        border: 1px solid rgba(42, 255, 168, 0.3);
-        color: var(--green);
-      }
-      .btn-full {
-        width: 100%;
-        border-radius: var(--radius-sm);
       }
       .emoji-grid {
         display: grid;
@@ -918,1964 +236,663 @@
         margin-top: 8px;
       }
       .emoji-opt {
-        aspect-ratio: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        border-radius: 10px;
+        background: #1a1a26;
+        border-radius: 50px;
+        padding: 10px;
+        text-align: center;
+        font-size: 1.4rem;
         cursor: pointer;
-        border: 2px solid transparent;
-        background: var(--bg);
-        transition: all 0.15s;
+        transition: all 0.2s;
       }
       .emoji-opt.selected {
-        border-color: var(--accent);
-        background: rgba(124, 106, 255, 0.15);
-      }
-      .info-box {
-        background: rgba(124, 106, 255, 0.08);
-        border: 1px solid rgba(124, 106, 255, 0.2);
-        border-radius: var(--radius-sm);
-        padding: 12px;
-        font-size: 0.82rem;
-        color: var(--text-muted);
-        line-height: 1.7;
-        margin-bottom: 14px;
-      }
-      .info-box b {
-        color: var(--accent);
-      }
-      @keyframes fadeUp {
-        from {
-          opacity: 0;
-          transform: translateY(16px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      .fade-up {
-        animation: fadeUp 0.4s ease both;
-      }
-      .fade-up-1 {
-        animation-delay: 0.05s;
-      }
-      .fade-up-2 {
-        animation-delay: 0.12s;
-      }
-      .fade-up-3 {
-        animation-delay: 0.19s;
-      }
-      .fade-up-4 {
-        animation-delay: 0.26s;
-      }
-      .fade-up-5 {
-        animation-delay: 0.33s;
+        background: #7c6aff;
+        transform: scale(1.05);
       }
       .toast {
         position: fixed;
         bottom: 30px;
         left: 50%;
         transform: translateX(-50%) translateY(80px);
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        border-radius: 50px;
-        padding: 10px 20px;
-        font-size: 0.88rem;
-        font-weight: 500;
-        transition:
-          transform 0.35s cubic-bezier(0.22, 0.68, 0, 1.2),
-          opacity 0.35s;
-        opacity: 0;
-        z-index: 999;
+        background: #1a1a26;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 60px;
+        padding: 10px 24px;
+        font-size: 0.9rem;
+        color: white;
+        z-index: 1100;
+        transition: transform 0.3s;
         white-space: nowrap;
-        backdrop-filter: blur(10px);
+        pointer-events: none;
       }
       .toast.show {
         transform: translateX(-50%) translateY(0);
-        opacity: 1;
       }
-
-      /* USER MANAGEMENT (setup screen) */
-      .user-manage-row {
+      .section-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #7c6aff;
+        margin: 20px 0 12px 0;
+      }
+      .back-btn {
+        background: rgba(255,255,255,0.08);
+        border: none;
+        padding: 8px 18px;
+        border-radius: 60px;
+        color: white;
+        font-family: 'Kanit', sans-serif;
+        margin-bottom: 16px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .flex-between {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .badge {
+        background: rgba(124,106,255,0.2);
+        border-radius: 60px;
+        padding: 4px 12px;
+        font-size: 0.75rem;
+      }
+      hr {
+        border-color: rgba(255,255,255,0.06);
+        margin: 16px 0;
+      }
+      .color-dot {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: transform 0.1s;
+      }
+      .color-dot.selected {
+        border-color: white;
+        transform: scale(1.1);
+      }
+      .color-grid {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .upload-preview {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 10px;
+        display: block;
+        border: 3px solid #7c6aff;
+      }
+      .checkbox-item {
         display: flex;
         align-items: center;
         gap: 12px;
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 12px 14px;
+        padding: 12px;
+        background: #1a1a26;
+        border-radius: 16px;
         margin-bottom: 8px;
-      }
-      .user-manage-avatar {
-        font-size: 1.4rem;
-        flex-shrink: 0;
-        width: 36px;
-        text-align: center;
-      }
-      .user-manage-info {
-        flex: 1;
-      }
-      .user-manage-name {
-        font-size: 0.95rem;
-        font-weight: 600;
-      }
-      .user-manage-sub {
-        font-size: 0.72rem;
-        color: var(--text-muted);
-        margin-top: 2px;
-      }
-      .user-manage-del {
-        background: rgba(255, 90, 122, 0.12);
-        border: 1px solid rgba(255, 90, 122, 0.3);
-        color: var(--red);
-        border-radius: 8px;
-        padding: 6px 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
         cursor: pointer;
-        font-family: "Kanit", sans-serif;
-        flex-shrink: 0;
       }
-      .user-manage-del:active {
-        opacity: 0.7;
+      .checkbox-item.selected {
+        border: 1px solid #7c6aff;
+        background: rgba(124,106,255,0.1);
       }
-      .color-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 6px;
-        margin-top: 8px;
-      }
-      .color-dot {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        cursor: pointer;
-        border: 3px solid transparent;
-        transition: transform 0.15s;
-      }
-      .color-dot.selected {
-        border-color: #fff;
-        transform: scale(1.15);
-      }
-      .color-dot:active {
-        transform: scale(0.9);
-      }
-
-      /* ACTIVITY LOG */
-      .log-item {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 13px 15px;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: flex-start;
-        gap: 11px;
-      }
-      .log-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        display: flex;
+      .sync-status {
+        display: inline-flex;
         align-items: center;
-        justify-content: center;
-        font-size: 0.95rem;
-        flex-shrink: 0;
-        margin-top: 1px;
+        gap: 8px;
+        background: rgba(255,255,255,0.05);
+        padding: 6px 14px;
+        border-radius: 60px;
+        font-size: 0.75rem;
+        margin-top: 10px;
+        cursor: pointer;
       }
-      .log-icon.pay {
-        background: rgba(42, 255, 168, 0.12);
+      .sync-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: gray;
       }
-      .log-icon.add {
-        background: rgba(255, 90, 122, 0.12);
-      }
-      .log-icon.split {
-        background: rgba(255, 208, 96, 0.12);
-      }
-      .log-icon.user-add {
-        background: rgba(124, 106, 255, 0.12);
-      }
-      .log-icon.user-del {
-        background: rgba(255, 90, 122, 0.08);
-      }
-      .log-info {
-        flex: 1;
-      }
-      .log-note {
-        font-size: 0.88rem;
-        font-weight: 500;
-        line-height: 1.4;
-      }
-      .log-date {
-        font-size: 0.7rem;
-        color: var(--text-muted);
-        margin-top: 3px;
-      }
-      .log-amount {
-        font-size: 0.95rem;
-        font-weight: 700;
-        white-space: nowrap;
-      }
-      .log-amount.pay {
-        color: var(--green);
-      }
-      .log-amount.add {
-        color: var(--red);
-      }
-      .log-amount.neutral {
-        color: var(--text-muted);
-      }
+      .sync-dot.online { background: #2affa8; box-shadow: 0 0 5px #2affa8; }
+      .sync-dot.offline { background: #ff5a7a; }
     </style>
   </head>
   <body>
     <div id="app">
-      <!-- SETUP -->
+      <!-- SETUP SCREEN -->
       <div id="screen-setup" class="screen">
-        <div class="setup-logo">🔥</div>
-        <div class="setup-title">ตั้งค่า Firebase</div>
-        <div class="setup-sub">
-          เชื่อมต่อ Firebase Realtime Database<br/>เพื่อ sync ทันทีทุกเครื่อง ไม่ต้องรีเฟรช
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div style="font-size: 3rem;">🏠💰</div>
+          <h1 style="font-size: 1.6rem;">HOUSE66 หนี้กันเอง</h1>
+          <p style="color: rgba(255,255,255,0.6);">เชื่อมต่อฐานข้อมูลเพื่อซิงค์ทุกคน</p>
         </div>
-        <div class="setup-card">
-          <h3>🚀 วิธีสร้าง Firebase</h3>
-          <div class="setup-step">
-            <div class="step-num">1</div>
-            <div class="step-text">ไปที่ <b>console.firebase.google.com</b> → สร้าง Project ใหม่ (ฟรี)</div>
+        <div class="card">
+          <h3>🔧 ตั้งค่า Firebase</h3>
+          <div class="form-group">
+            <label class="form-label">Firebase Config (JSON)</label>
+            <textarea id="setup-firebase-config" class="form-textarea" rows="6" placeholder='{"apiKey":"...","databaseURL":"..."}' style="font-family: monospace;"></textarea>
           </div>
-          <div class="setup-step">
-            <div class="step-num">2</div>
-            <div class="step-text"><b>Build → Realtime Database → Create database</b><br/>เลือก <b>Start in test mode</b></div>
+          <div class="form-group">
+            <label class="form-label">รหัสห้อง (Room Key)</label>
+            <input id="setup-room-key" class="form-input" placeholder="house66" value="house66">
           </div>
-          <div class="setup-step">
-            <div class="step-num">3</div>
-            <div class="step-text"><b>Project Settings ⚙️ → General → Your apps</b><br/>คลิก <b>&lt;/&gt; Web</b> → Register app → เอา config มาวางด้านล่าง</div>
-          </div>
-          <div class="setup-step">
-            <div class="step-num">4</div>
-            <div class="step-text">วาง <b>firebaseConfig</b> ทั้งก้อน (JSON) ในช่องด้านล่าง</div>
+          <div class="flex-between" style="gap: 12px;">
+            <button onclick="skipSetup()" class="btn btn-secondary" style="flex:1;">⏭️ ข้าม</button>
+            <button onclick="saveSetup()" class="btn btn-primary" style="flex:1;">🔥 เชื่อมต่อ</button>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Firebase Config (JSON)</label>
-          <textarea
-            class="form-input"
-            id="setup-firebase-config"
-            rows="7"
-            placeholder='{&#10;  "apiKey": "...",&#10;  "authDomain": "...",&#10;  "databaseURL": "...",&#10;  "projectId": "..."&#10;}'
-            style="font-size: 0.72rem; font-family: monospace; resize: none;"
-          ></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Room Key (ชื่อห้อง — ใช้ร่วมกันทุกคน)</label>
-          <input
-            class="form-input"
-            id="setup-room-key"
-            placeholder="house66"
-            style="font-size: 0.9rem"
-          />
-          <div style="font-size:.72rem;color:var(--text-muted);margin-top:5px;">ทุกคนในบ้านต้องใช้ Room Key เดียวกัน</div>
-        </div>
-        <div style="display: flex; gap: 10px; margin-bottom: 20px">
-          <button class="btn btn-secondary" onclick="skipSetup()">
-            ข้ามก่อน
-          </button>
-          <button class="btn btn-primary" onclick="saveSetup()">
-            🔥 เชื่อมต่อ Firebase
-          </button>
-        </div>
-
-        <!-- USER MANAGEMENT -->
-        <div class="setup-card">
-          <h3>👥 จัดการผู้ใช้</h3>
+        <div class="card">
+          <div class="flex-between">
+            <h3>👥 จัดการคนในกลุ่ม</h3>
+            <button onclick="openAddUserModal()" class="btn btn-primary" style="padding: 6px 16px; font-size:0.8rem;">+ เพิ่มคน</button>
+          </div>
           <div id="setup-user-list"></div>
-          <button
-            class="btn btn-primary btn-full"
-            style="margin-top: 4px; font-size: 0.85rem"
-            onclick="openAddUserModal()"
-          >
-            + เพิ่มคนใหม่
-          </button>
         </div>
-
-        <!-- ACTIVITY LOG -->
-        <div class="setup-card">
-          <h3>📋 Log กิจกรรมทั้งหมด</h3>
-          <div
-            style="
-              display: flex;
-              gap: 8px;
-              margin-bottom: 12px;
-              flex-wrap: wrap;
-            "
-          >
-            <button
-              class="toggle-btn active"
-              style="flex: 0 0 auto; padding: 6px 12px; font-size: 0.75rem"
-              id="log-filter-all"
-              onclick="filterLog('all')"
-            >
-              ทั้งหมด
-            </button>
-            <button
-              class="toggle-btn"
-              style="flex: 0 0 auto; padding: 6px 12px; font-size: 0.75rem"
-              id="log-filter-pay"
-              onclick="filterLog('pay')"
-            >
-              💸 จ่าย
-            </button>
-            <button
-              class="toggle-btn"
-              style="flex: 0 0 auto; padding: 6px 12px; font-size: 0.75rem"
-              id="log-filter-add"
-              onclick="filterLog('add')"
-            >
-              ➕ เพิ่มหนี้
-            </button>
-            <button
-              class="toggle-btn"
-              style="flex: 0 0 auto; padding: 6px 12px; font-size: 0.75rem"
-              id="log-filter-split"
-              onclick="filterLog('split')"
-            >
-              🍻 หาร
-            </button>
+        <div class="card">
+          <h3>📜 ประวัติทั้งหมด</h3>
+          <div class="flex-between" style="margin-bottom: 12px;">
+            <button onclick="filterLog('all')" id="log-filter-all" class="badge" style="background:#7c6aff30;">ทั้งหมด</button>
+            <button onclick="filterLog('pay')" id="log-filter-pay" class="badge">💸 จ่าย</button>
+            <button onclick="filterLog('add')" id="log-filter-add" class="badge">➕ เพิ่มหนี้</button>
+            <button onclick="filterLog('split')" id="log-filter-split" class="badge">🍻 หาร</button>
           </div>
-          <div id="activity-log-list"></div>
+          <div id="activity-log-list" style="max-height: 300px; overflow-y: auto;"></div>
         </div>
-
-        <div style="padding-bottom: 10px">
-          <button
-            class="btn btn-secondary btn-full"
-            onclick="
-              showScreen('screen-select');
-              renderSelect();
-            "
-          >
-            ← กลับหน้าหลัก
-          </button>
-        </div>
+        <button onclick="showScreen('screen-select')" class="btn btn-secondary" style="width:100%; margin-top:8px;">← กลับหน้าหลัก</button>
       </div>
 
-      <!-- SELECT -->
+      <!-- SELECT USER SCREEN -->
       <div id="screen-select" class="screen">
-        <div class="select-header">
-          <h1>HOUSE<span> 66</span><br />DERJA 💸</h1>
-          <p>เลือกโปรไฟล์เพื่อดูรายการ</p>
-          <div class="sync-status" id="sync-status" onclick="manualSync()">
-            <div class="sync-dot" id="sync-dot"></div>
+        <div style="text-align: center; margin-bottom: 16px;">
+          <h1 style="font-size: 2rem;">HOUSE<span style="color:#7c6aff;">66</span></h1>
+          <p style="color: rgba(255,255,255,0.6);">เลือกโปรไฟล์ของคุณ</p>
+          <div id="sync-status-bar" class="sync-status" onclick="manualSync()">
+            <div id="sync-dot" class="sync-dot offline"></div>
             <span id="sync-label">ไม่ได้เชื่อมต่อ</span>
-            <span id="sync-live-badge" style="display:none;font-size:.65rem;background:rgba(42,255,168,.15);color:var(--green);border:1px solid rgba(42,255,168,.3);border-radius:50px;padding:1px 7px;margin-left:2px;">LIVE</span>
           </div>
         </div>
-        <div class="user-grid" id="user-grid"></div>
-        <div class="bottom-actions">
-          <button
-            class="btn btn-secondary"
-            style="border-radius: var(--radius); padding: 14px"
-            onclick="openSplit(false)"
-          >
-            🍻 หารบิล
-          </button>
-          <button
-            class="btn btn-secondary"
-            style="border-radius: var(--radius); padding: 14px; flex: 0 0 auto"
-            onclick="showScreen('screen-setup')"
-          >
-            ⚙️
-          </button>
+        <div id="user-grid" class="user-grid"></div>
+        <div class="flex-between" style="gap: 12px; margin-top: 16px;">
+          <button onclick="openSplit(false)" class="btn btn-secondary" style="flex:1;">🍻 หารบิล</button>
+          <button onclick="showScreen('screen-setup')" class="btn btn-secondary" style="flex:0;">⚙️</button>
         </div>
       </div>
 
-      <!-- DASHBOARD -->
+      <!-- DASHBOARD SCREEN -->
       <div id="screen-dashboard" class="screen">
-        <div class="dash-header">
-          <button
-            class="back-btn"
-            onclick="
-              showScreen('screen-select');
-              renderSelect();
-            "
-          >
-            ← กลับ
-          </button>
-          <div class="dash-profile">
-            <div class="dash-avatar" onclick="openEditProfile()">
-              <span id="dash-avatar-emoji">🙂</span>
-              <span class="edit-icon">✏️</span>
-            </div>
+        <button onclick="showScreen('screen-select')" class="back-btn">← กลับ</button>
+        <div class="flex-between" style="margin-bottom: 16px;">
+          <div class="flex-between" style="gap:12px;">
+            <div id="dash-avatar" class="user-avatar" style="width: 56px; height: 56px; margin:0; cursor:pointer;" onclick="openEditProfile()">😎</div>
             <div>
-              <div class="dash-name" id="dash-name">-</div>
+              <h2 id="dash-name" style="font-size:1.4rem;">-</h2>
               <div id="dash-net-badge"></div>
             </div>
           </div>
+          <button onclick="openSplit(true)" class="btn btn-primary" style="padding:8px 16px;">🍻 หาร</button>
         </div>
-        <div class="stats-row fade-up fade-up-1">
-          <div class="stat-card debt-card">
-            <div class="stat-icon">😰</div>
-            <div class="stat-label">ฉันเป็นหนี้</div>
-            <div class="stat-amount red" id="stat-owe">฿0</div>
+        <div class="stats-row">
+          <div class="stat-card">
+            <div style="font-size:1.8rem;">😰</div>
+            <div style="font-size:0.7rem; opacity:0.7;">ฉันเป็นหนี้</div>
+            <div id="stat-owe" style="font-size:1.3rem; font-weight:bold; color:#ff5a7a;">฿0</div>
           </div>
-          <div class="stat-card credit-card">
-            <div class="stat-icon">🤑</div>
-            <div class="stat-label">ฉันมีลูกหนี้</div>
-            <div class="stat-amount green" id="stat-owed">฿0</div>
+          <div class="stat-card">
+            <div style="font-size:1.8rem;">🤑</div>
+            <div style="font-size:0.7rem; opacity:0.7;">เป็นหนี้ฉัน</div>
+            <div id="stat-owed" style="font-size:1.3rem; font-weight:bold; color:#2affa8;">฿0</div>
           </div>
         </div>
-        <div class="section-header fade-up fade-up-2">
-          <div class="section-title">😰 ฉันเป็นหนี้ใคร</div>
+        <div class="section-title">😰 ฉันเป็นหนี้ใคร</div>
+        <div id="list-i-owe"></div>
+        <div class="section-title flex-between">
+          <span>🤑 ใครเป็นหนี้ฉัน</span>
+          <button onclick="openAddDebtorModal()" class="btn btn-primary" style="padding:4px 12px; font-size:0.7rem;">+ เพิ่มลูกหนี้</button>
         </div>
-        <div class="debt-list fade-up fade-up-3" id="list-i-owe"></div>
-        <hr class="section-separator" />
-        <div class="section-header fade-up fade-up-4">
-          <div class="section-title">🤑 ใครเป็นหนี้ฉัน</div>
-          <button class="section-add-btn" onclick="openAddDebtorModal()">
-            + เพิ่มลูกหนี้
-          </button>
-        </div>
-        <div class="debt-list fade-up fade-up-5" id="list-owe-me"></div>
-        <div style="padding: 14px 16px 0">
-          <button class="btn btn-secondary btn-full" onclick="openSplit(true)">
-            🍻 หารบิล
-          </button>
-        </div>
+        <div id="list-owe-me"></div>
       </div>
 
-      <!-- DETAIL -->
+      <!-- DETAIL SCREEN -->
       <div id="screen-detail" class="screen">
-        <div class="detail-header" id="detail-header">
-          <button
-            class="back-btn"
-            onclick="
-              showScreen('screen-dashboard');
-              renderDash();
-            "
-            style="position: relative; z-index: 2"
-          >
-            ← กลับ
-          </button>
-          <div class="detail-avatar-wrap" id="detail-avatar">🙂</div>
-          <div class="detail-name" id="detail-name">-</div>
-          <div class="detail-amount-big" id="detail-amount">฿0</div>
-          <div class="detail-direction" id="detail-direction">-</div>
+        <button onclick="goBackFromDetail()" class="back-btn">← กลับ</button>
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div id="detail-avatar" class="user-avatar" style="width: 90px; height: 90px; margin:0 auto 12px;">🙂</div>
+          <h2 id="detail-name" style="font-size:1.5rem;">-</h2>
+          <div id="detail-amount" style="font-size:2rem; font-weight:bold; margin:8px 0;">฿0</div>
+          <div id="detail-direction" style="font-size:0.8rem; opacity:0.7;"></div>
         </div>
-        <div class="action-btns" id="detail-actions"></div>
-        <div style="padding: 18px 0 10px 22px" class="section-title">
-          ประวัติรายการ
-        </div>
-        <div class="history-list" id="detail-history"></div>
+        <div id="detail-actions" class="flex-between" style="gap:12px; margin-bottom:24px;"></div>
+        <div class="section-title">📜 ประวัติรายการ</div>
+        <div id="detail-history"></div>
       </div>
 
-      <!-- SPLIT -->
+      <!-- SPLIT SCREEN -->
       <div id="screen-split" class="screen">
-        <div class="split-header">
-          <button class="back-btn" id="split-back-btn">← กลับ</button>
-          <div style="font-size: 2rem; margin-bottom: 8px">🍻</div>
-          <h2 style="font-size: 1.5rem; font-weight: 800">หารบิล</h2>
-          <p
-            style="
-              color: var(--text-muted);
-              font-size: 0.85rem;
-              margin-top: 4px;
-            "
-          >
-            ใส่ยอดบิลและเลือกคนที่ร่วมหาร
-          </p>
+        <button id="split-back-btn" class="back-btn">← กลับ</button>
+        <div style="text-align:center; margin: 10px 0;"><span style="font-size:3rem;">🍻</span></div>
+        <div class="form-group">
+          <label class="form-label">ชื่อรายการ (ไม่บังคับ)</label>
+          <input id="split-note" class="form-input" placeholder="เช่น กินข้าวทะเล">
         </div>
-        <div style="padding: 20px 16px 0">
-          <div class="form-group">
-            <label class="form-label">ชื่อรายการ (ไม่บังคับ)</label>
-            <input
-              class="form-input"
-              id="split-note"
-              placeholder="เช่น ดื่มที่ริมน้ำ..."
-            />
-          </div>
-          <div class="form-group">
-            <label class="form-label">ยอดบิลทั้งหมด (บาท)</label>
-            <input
-              class="form-input"
-              id="split-total"
-              type="number"
-              placeholder="0"
-              inputmode="decimal"
-              oninput="updateSplitPreview()"
-            />
-          </div>
-          <div class="form-group">
-            <label class="form-label">ผู้จ่าย (คนที่ออกเงินไป)</label>
-            <div class="checkbox-list" id="split-payer-list"></div>
-          </div>
-          <div class="form-group">
-            <label class="form-label"
-              >คนที่ร่วมหาร (รวมผู้จ่ายด้วยถ้าร่วมด้วย)</label
-            >
-            <div class="checkbox-list" id="split-people-list"></div>
-          </div>
-          <div
-            id="split-preview"
-            style="
-              margin-bottom: 20px;
-              padding: 16px;
-              background: var(--surface);
-              border-radius: var(--radius-sm);
-              border: 1px solid var(--border);
-              display: none;
-            "
-          >
-            <div style="font-weight: 600; margin-bottom: 8px">ตัวอย่างผล</div>
-            <div
-              id="split-preview-content"
-              style="
-                font-size: 0.88rem;
-                color: var(--text-muted);
-                line-height: 1.8;
-              "
-            ></div>
-          </div>
-          <button class="btn btn-primary btn-full" onclick="confirmSplit()">
-            ✅ ยืนยันและเพิ่มหนี้
-          </button>
+        <div class="form-group">
+          <label class="form-label">ยอดรวมทั้งหมด (บาท)</label>
+          <input id="split-total" type="number" class="form-input" placeholder="0" oninput="updateSplitPreview()">
         </div>
+        <div class="form-group">
+          <label class="form-label">👤 ผู้จ่าย (คนที่จ่ายจริง)</label>
+          <div id="split-payer-list"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">👥 คนที่ร่วมหาร</label>
+          <div id="split-people-list"></div>
+        </div>
+        <div id="split-preview" style="background:#1a1a26; border-radius:20px; padding:16px; margin:16px 0; display:none;"></div>
+        <button onclick="confirmSplit()" class="btn btn-primary btn-full">✅ ยืนยันและเพิ่มหนี้</button>
       </div>
 
-      <!-- Add User Modal -->
-      <div class="modal-overlay" id="modal-add-user">
-        <div class="modal">
-          <div class="modal-handle"></div>
-          <div class="modal-title">👤 เพิ่มคนใหม่</div>
-          <div class="form-group">
-            <label class="form-label">ชื่อ</label>
-            <input
-              class="form-input"
-              id="new-user-name"
-              placeholder="เช่น มิ้น..."
-            />
-          </div>
-          <div class="form-group">
-            <label class="form-label">รูปโปรไฟล์ (ไม่บังคับ)</label>
-            <div
-              class="upload-zone"
-              onclick="document.getElementById('new-user-file-input').click()"
-            >
-              <input
-                type="file"
-                id="new-user-file-input"
-                accept="image/*"
-                onchange="handleNewUserPhoto(event)"
-                style="display: none"
-              />
-              <div id="new-user-photo-preview-wrap">
-                <div style="font-size: 2.5rem; margin-bottom: 6px">📷</div>
-                <div class="upload-label" style="font-size: 0.78rem">
-                  แตะเพื่อเลือกรูป (ไม่บังคับ)
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Emoji โปรไฟล์</label>
-            <div class="emoji-grid" id="new-user-emoji-grid"></div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">สีธีม</label>
-            <div class="color-grid" id="new-user-color-grid"></div>
-          </div>
-          <div style="display: flex; gap: 10px; margin-top: 4px">
-            <button
-              class="btn btn-secondary"
-              onclick="closeModal('modal-add-user')"
-            >
-              ยกเลิก
-            </button>
-            <button class="btn btn-primary" onclick="confirmAddUser()">
-              ✅ เพิ่ม
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Confirm Delete User Modal -->
-      <div class="modal-overlay" id="modal-del-user">
-        <div class="modal">
-          <div class="modal-handle"></div>
-          <div class="modal-title">🗑️ ลบผู้ใช้</div>
-          <div class="info-box" id="del-user-info"></div>
-          <p
-            style="
-              font-size: 0.85rem;
-              color: var(--text-muted);
-              margin-bottom: 16px;
-              line-height: 1.6;
-            "
-          >
-            การลบจะลบข้อมูลหนี้และประวัติทุกรายการของคนนี้ด้วย
-            ไม่สามารถกู้คืนได้
-          </p>
-          <div style="display: flex; gap: 10px">
-            <button
-              class="btn btn-secondary"
-              onclick="closeModal('modal-del-user')"
-            >
-              ยกเลิก
-            </button>
-            <button class="btn btn-danger" onclick="confirmDelUser()">
-              🗑️ ลบเลย
-            </button>
-          </div>
-        </div>
-      </div>
+      <!-- MODALS -->
+      <div id="modal-add-user" class="modal-overlay"><div class="modal"><h3>👤 เพิ่มคนใหม่</h3><div class="form-group"><input id="new-user-name" class="form-input" placeholder="ชื่อ"></div><div class="form-group"><label>อีโมจิโปรไฟล์</label><div id="new-user-emoji-grid" class="emoji-grid"></div></div><div class="form-group"><label>สีธีม</label><div id="new-user-color-grid" class="color-grid"></div></div><div class="flex-between"><button onclick="closeModal('modal-add-user')" class="btn btn-secondary">ยกเลิก</button><button onclick="confirmAddUser()" class="btn btn-primary">✅ เพิ่ม</button></div></div></div>
+      <div id="modal-pay" class="modal-overlay"><div class="modal"><h3>💸 จ่ายหนี้</h3><div id="pay-info-box" class="card" style="background:#1a1a26; margin-bottom:16px;"></div><div class="form-group"><input id="pay-amount" type="number" class="form-input" placeholder="จำนวนเงิน"></div><div class="form-group"><input id="pay-note" class="form-input" placeholder="หมายเหตุ (เช่น จ่ายค่าอาหาร)"></div><div class="flex-between"><button onclick="closeModal('modal-pay')" class="btn btn-secondary">ยกเลิก</button><button onclick="confirmPay()" class="btn btn-success">✅ ยืนยัน</button></div></div></div>
+      <div id="modal-add-debt" class="modal-overlay"><div class="modal"><h3>➕ เพิ่มหนี้</h3><div class="form-group"><input id="add-debt-amount" type="number" class="form-input" placeholder="จำนวน"></div><div class="form-group"><input id="add-debt-note" class="form-input" placeholder="หมายเหตุ"></div><div class="flex-between"><button onclick="closeModal('modal-add-debt')" class="btn btn-secondary">ยกเลิก</button><button onclick="confirmAddDebt()" class="btn btn-danger">➕ เพิ่ม</button></div></div></div>
+      <div id="modal-add-debtor" class="modal-overlay"><div class="modal"><h3>🤑 เพิ่มลูกหนี้</h3><div class="form-group"><div id="debtor-person-list"></div></div><div class="form-group"><input id="debtor-amount" class="form-input" placeholder="จำนวนเงิน"></div><div class="form-group"><input id="debtor-note" class="form-input" placeholder="หมายเหตุ"></div><div class="flex-between"><button onclick="closeModal('modal-add-debtor')" class="btn btn-secondary">ยกเลิก</button><button onclick="confirmAddDebtor()" class="btn btn-primary">✅ เพิ่ม</button></div></div></div>
+      <div id="modal-edit-profile" class="modal-overlay"><div class="modal"><h3>✏️ แก้ไขโปรไฟล์</h3><div class="form-group"><input id="edit-name" class="form-input" placeholder="ชื่อ"></div><div class="form-group"><label>อีโมจิ</label><div id="edit-emoji-grid" class="emoji-grid"></div></div><div class="flex-between"><button onclick="closeModal('modal-edit-profile')" class="btn btn-secondary">ยกเลิก</button><button onclick="saveProfile()" class="btn btn-primary">💾 บันทึก</button></div></div></div>
+      <div id="modal-del-user" class="modal-overlay"><div class="modal"><h3>🗑️ ลบผู้ใช้</h3><div id="del-user-info" class="card"></div><div class="flex-between"><button onclick="closeModal('modal-del-user')" class="btn btn-secondary">ยกเลิก</button><button onclick="confirmDelUser()" class="btn btn-danger">🗑️ ลบเลย</button></div></div></div>
     </div>
-    <!-- #app -->
-
-    <!-- MODALS -->
-    <div class="modal-overlay" id="modal-pay">
-      <div class="modal">
-        <div class="modal-handle"></div>
-        <div class="modal-title">💸 จ่ายหนี้</div>
-        <div class="info-box" id="pay-info-box"></div>
-        <div class="form-group">
-          <label class="form-label">จำนวนที่จ่าย (บาท)</label>
-          <input
-            class="form-input"
-            id="pay-amount"
-            type="number"
-            placeholder="0"
-            inputmode="decimal"
-          />
-        </div>
-        <div class="form-group">
-          <label class="form-label">วิธีจ่าย</label>
-          <div class="toggle-group">
-            <button
-              class="toggle-btn active"
-              id="pay-method-cash"
-              onclick="selectPayMethod('cash')"
-            >
-              💵 เงินสด
-            </button>
-            <button
-              class="toggle-btn"
-              id="pay-method-transfer"
-              onclick="selectPayMethod('transfer')"
-            >
-              📲 อัพสลีฟ
-            </button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">หมายเหตุ (ไม่บังคับ)</label>
-          <input
-            class="form-input"
-            id="pay-note"
-            placeholder="เช่น จ่ายค่ากินข้าว..."
-          />
-        </div>
-        <div style="display: flex; gap: 10px">
-          <button class="btn btn-secondary" onclick="closeModal('modal-pay')">
-            ยกเลิก
-          </button>
-          <button class="btn btn-success" onclick="confirmPay()">
-            ✅ ยืนยัน
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-overlay" id="modal-add-debt">
-      <div class="modal">
-        <div class="modal-handle"></div>
-        <div class="modal-title" id="add-debt-title">➕ เพิ่มหนี้</div>
-        <div class="form-group">
-          <label class="form-label">จำนวน (บาท)</label>
-          <input
-            class="form-input"
-            id="add-debt-amount"
-            type="number"
-            placeholder="0"
-            inputmode="decimal"
-          />
-        </div>
-        <div class="form-group">
-          <label class="form-label">หมายเหตุ</label>
-          <input
-            class="form-input"
-            id="add-debt-note"
-            placeholder="เช่น ค่าอาหาร..."
-          />
-        </div>
-        <div style="display: flex; gap: 10px">
-          <button
-            class="btn btn-secondary"
-            onclick="closeModal('modal-add-debt')"
-          >
-            ยกเลิก
-          </button>
-          <button class="btn btn-danger" onclick="confirmAddDebt()">
-            ➕ เพิ่ม
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-overlay" id="modal-add-debtor">
-      <div class="modal">
-        <div class="modal-handle"></div>
-        <div class="modal-title">🤑 เพิ่มลูกหนี้</div>
-        <div class="form-group">
-          <label class="form-label">คนที่ติดหนี้คุณ</label>
-          <div class="checkbox-list" id="debtor-person-list"></div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">จำนวน (บาท)</label>
-          <input
-            class="form-input"
-            id="debtor-amount"
-            type="number"
-            placeholder="0"
-            inputmode="decimal"
-          />
-        </div>
-        <div class="form-group">
-          <label class="form-label">หมายเหตุ</label>
-          <input
-            class="form-input"
-            id="debtor-note"
-            placeholder="เช่น ค่าอาหาร..."
-          />
-        </div>
-        <div style="display: flex; gap: 10px">
-          <button
-            class="btn btn-secondary"
-            onclick="closeModal('modal-add-debtor')"
-          >
-            ยกเลิก
-          </button>
-          <button class="btn btn-primary" onclick="confirmAddDebtor()">
-            ✅ เพิ่ม
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-overlay" id="modal-edit-profile">
-      <div class="modal">
-        <div class="modal-handle"></div>
-        <div class="modal-title">✏️ แก้ไขโปรไฟล์</div>
-        <div class="form-group">
-          <label class="form-label">รูปโปรไฟล์</label>
-          <div
-            class="upload-zone"
-            onclick="document.getElementById('profile-file-input').click()"
-          >
-            <input
-              type="file"
-              id="profile-file-input"
-              accept="image/*"
-              onchange="handleProfilePhoto(event)"
-              style="display: none"
-            />
-            <div id="profile-photo-preview-wrap">
-              <div
-                id="profile-photo-placeholder"
-                style="font-size: 3rem; margin-bottom: 8px"
-              >
-                📷
-              </div>
-              <div class="upload-label">
-                แตะเพื่อเลือกรูป<br /><span
-                  style="font-size: 0.72rem; opacity: 0.6"
-                  >JPG, PNG, HEIC — ปรับขนาดอัตโนมัติ</span
-                >
-              </div>
-            </div>
-          </div>
-          <div style="display: flex; gap: 8px; margin-top: 8px">
-            <button
-              class="btn btn-secondary"
-              style="flex: 1; font-size: 0.8rem; padding: 9px"
-              onclick="document.getElementById('profile-file-input').click()"
-            >
-              📂 เลือกรูป
-            </button>
-            <button
-              class="btn btn-danger"
-              style="flex: 1; font-size: 0.8rem; padding: 9px"
-              id="remove-photo-btn"
-              onclick="removeProfilePhoto()"
-            >
-              🗑️ ลบรูป
-            </button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">ชื่อ</label>
-          <input class="form-input" id="edit-name" placeholder="ชื่อของคุณ" />
-        </div>
-        <div class="form-group" id="emoji-section">
-          <label class="form-label">Emoji (ใช้แทนรูปถ้าไม่มีรูป)</label>
-          <div class="emoji-grid" id="emoji-grid"></div>
-        </div>
-        <div style="display: flex; gap: 10px; margin-top: 4px">
-          <button
-            class="btn btn-secondary"
-            onclick="closeModal('modal-edit-profile')"
-          >
-            ยกเลิก
-          </button>
-          <button class="btn btn-primary" onclick="saveProfile()">
-            💾 บันทึก
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="toast" id="toast"></div>
+    <div id="toast" class="toast"></div>
 
     <script>
-      // ── Firebase ─────────────────────────────────────────────────
-      let firebaseApp = null, firebaseDB = null, firebaseRef = null, fbUnsub = null;
-      let roomKey = "house66";
+      // ---------- GLOBAL STATE ----------
+      let db = {
+        users: {
+          "pp": { id: "pp", name: "พีพี", emoji: "😎", color: "#c83dff", photo: null },
+          "ern": { id: "ern", name: "เอิน", emoji: "🤩", color: "#00c6ff", photo: null },
+          "kung": { id: "kung", name: "กุ้ง", emoji: "😏", color: "#2affa8", photo: null },
+          "ice": { id: "ice", name: "ไอซ์", emoji: "😇", color: "#6ad3ff", photo: null }
+        },
+        debts: { "pp": {}, "ern": {}, "kung": {}, "ice": {} },
+        history: []
+      };
+      let currentUser = null;
+      let currentDetail = null;
+      let firebaseRef = null;
+      let firebaseDb = null;
+      let logFilter = "all";
+      const EMOJIS = ["😎","🥶","🤩","😏","🤑","😤","🥳","🙄","😇","🫡","🤓","🥸","😈","👑","🔥","⚡","💫","🌸","🎸","🍺","🎲","💎","🚀","🐱","🐶","🦊"];
+      const COLORS = ["#c83dff","#00c6ff","#2affa8","#6ad3ff","#ffd060","#ff5a7a","#ff914d","#a8ff78","#7c6aff","#ff6a9e"];
 
+      let splitPayer = null, splitPeople = [], splitFromDash = false;
+
+      // ---------- HELPERS ----------
+      function fmt(n) { return "฿" + Math.abs(n).toLocaleString('th-TH'); }
+      function thaiDate(ts) { return new Date(ts).toLocaleString('th-TH', { hour: '2-digit', minute:'2-digit', day:'numeric', month:'short' }); }
+      function showToast(msg) { let t = document.getElementById('toast'); t.innerText = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
+      function getDebt(from, to) { return (db.debts[from] && db.debts[from][to]) || 0; }
+      function setDebt(from, to, val) { if(!db.debts[from]) db.debts[from]={}; db.debts[from][to]=Math.max(0,val); }
+      function addDebtRaw(from, to, amount) { setDebt(from, to, getDebt(from, to) + amount); }
+      function saveLocal() { localStorage.setItem('house66_db', JSON.stringify(db)); }
+      function loadLocal() { let d = localStorage.getItem('house66_db'); if(d) db = JSON.parse(d); }
+      function saveAndSync() { saveLocal(); if(firebaseRef) firebaseRef.set(db).catch(e=>showToast("Sync error")); }
+
+      // ---------- FIREBASE ----------
       async function initFirebase(config, room) {
         try {
-          const { initializeApp, getDatabase, ref, set, onValue } = window.__firebase;
-          // If already initialized with same config, just update ref
-          if (!firebaseApp) {
-            firebaseApp = initializeApp(config, "debtapp-" + Date.now());
-          }
-          firebaseDB = getDatabase(firebaseApp);
-          roomKey = room || "house66";
-          firebaseRef = ref(firebaseDB, "rooms/" + roomKey + "/db");
-
-          // Start listening for real-time changes
-          if (fbUnsub) fbUnsub();
-          fbUnsub = onValue(firebaseRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-              // Merge: don't overwrite if we just pushed (debounce by ts)
+          const { initializeApp, getDatabase, ref } = window.__firebase;
+          let app = initializeApp(config);
+          let database = getDatabase(app);
+          let dbRef = ref(database, `rooms/${room}/data`);
+          firebaseRef = dbRef;
+          // Listen
+          const { onValue } = window.__firebase;
+          onValue(dbRef, (snap) => {
+            let data = snap.val();
+            if(data) {
               db = data;
               saveLocal();
-              renderSelect();
-              if (currentUser && document.getElementById("screen-dashboard").classList.contains("active")) renderDash();
-              if (currentDetail && document.getElementById("screen-detail").classList.contains("active")) renderDetail();
-              setSyncUI("ok", "✅ เชื่อมต่อแล้ว", true);
+              refreshUI();
             }
-          }, (err) => {
-            setSyncUI("err", "❌ " + err.code, false);
           });
-          setSyncUI("ok", "✅ เชื่อมต่อแล้ว", true);
           return true;
-        } catch (e) {
-          setSyncUI("err", "❌ Config ผิด", false);
-          console.error(e);
-          return false;
-        }
+        } catch(e) { console.error(e); return false; }
       }
-
-      async function fbPush() {
-        if (!firebaseRef) return;
+      function saveSetup() {
+        let raw = document.getElementById("setup-firebase-config").value.trim();
+        let room = document.getElementById("setup-room-key").value.trim() || "house66";
         try {
-          const { ref, set } = window.__firebase;
-          await set(firebaseRef, db);
-        } catch(e) {
-          setSyncUI("err", "❌ Push ไม่ได้", false);
-        }
+          let cfg = JSON.parse(raw);
+          if(!cfg.databaseURL) throw new Error("No databaseURL");
+          localStorage.setItem('fb_config', raw);
+          localStorage.setItem('fb_room', room);
+          initFirebase(cfg, room).then(ok => {
+            if(ok) { showToast("✅ เชื่อมต่อสำเร็จ!"); showScreen('screen-select'); renderSelect(); }
+            else showToast("❌ Config ผิดพลาด");
+          });
+        } catch(e) { showToast("⚠️ JSON ไม่ถูกต้อง"); }
       }
+      function skipSetup() { showScreen('screen-select'); renderSelect(); }
+      function manualSync() { if(firebaseRef) firebaseRef.set(db).then(()=>showToast("🔄 ซิงค์แล้ว")); else showToast("⚠️ ยังไม่ได้ตั้งค่า Firebase"); }
 
-      // ── State ─────────────────────────────────────────────────────
-      const EMOJIS = [
-        "😎",
-        "🥶",
-        "🤩",
-        "😏",
-        "🤑",
-        "😤",
-        "🥳",
-        "🙄",
-        "😇",
-        "🫡",
-        "🤓",
-        "🥸",
-        "😈",
-        "👑",
-        "🔥",
-        "⚡",
-        "💫",
-        "🌊",
-        "🌸",
-        "🎸",
-        "🍺",
-        "🎲",
-        "💎",
-        "🚀",
-      ];
-
-      const DEFAULT_DB = {
-        users: {
-          pp: { id: "pp", name: "พีพี", emoji: "😎", color: "#c83dff" },
-          ern: { id: "ern", name: "เอิน", emoji: "🤩", color: "#00c6ff" },
-          kung: { id: "kung", name: "กุ้ง", emoji: "😏", color: "#5aff8a" },
-          ice: { id: "ice", name: "ไอซ์", emoji: "😇", color: "#6ad3ff" },
-        },
-        debts: {
-          pp: {},
-          ern: {},
-          kung: {},
-          ice: {},
-        },
-        history: [],
-      };
-
-      let db = JSON.parse(JSON.stringify(DEFAULT_DB));
-      let firebaseConfig = null;
-      let currentUser = null;
-      let currentDetail = null; // { from, to }
-      let payMethod = "cash";
-      let selectedEmoji = null;
-      let splitPayer = null;
-      let splitPeople = [];
-      let selectedDebtor = null;
-      let splitFromDash = false;
-
-      const DB_VERSION = "v2";
-
-      function ls(k, v) {
-        try {
-          if (v === undefined) return localStorage.getItem(k);
-          localStorage.setItem(k, v);
-        } catch (e) {
-          return null;
-        }
-      }
-
-      // ล้าง localStorage ถ้า version เปลี่ยน
-      if (ls("debt_db_version") !== DB_VERSION) {
-        localStorage.removeItem("debt_db");
-        ls("debt_db_version", DB_VERSION);
-      }
-      function saveLocal() {
-        ls("debt_db", JSON.stringify(db));
-      }
-      function loadLocal() {
-        const s = ls("debt_db");
-        if (s) {
-          try { db = JSON.parse(s); } catch (e) {}
-        }
-        const fc = ls("debt_firebase_config");
-        const rk = ls("debt_room_key");
-        if (fc) {
-          try {
-            firebaseConfig = JSON.parse(fc);
-            roomKey = rk || "house66";
-          } catch(e) {}
-        }
-      }
-
-      // ── Sync UI ───────────────────────────────────────────────────
-      function setSyncUI(state, label, live) {
-        const dot = document.getElementById("sync-dot");
-        const lbl = document.getElementById("sync-label");
-        const badge = document.getElementById("sync-live-badge");
-        if (!dot || !lbl) return;
-        dot.className = "sync-dot" + (state === "ok" ? " ok" : state === "err" ? " err" : "");
-        lbl.textContent = label;
-        if (badge) badge.style.display = live ? "" : "none";
-      }
-
-      function manualSync() {
-        if (!firebaseRef) {
-          showToast("⚙️ ตั้งค่า Firebase ก่อน");
-          showScreen("screen-setup");
-          return;
-        }
-        fbPush().then(() => showToast("🔄 Push แล้ว!"));
-      }
-
-      function saveAndSync() {
-        saveLocal();
-        fbPush();
-      }
-
-      async function saveSetup() {
-        const raw = document.getElementById("setup-firebase-config").value.trim();
-        const room = (document.getElementById("setup-room-key").value.trim() || "house66").replace(/[^a-z0-9_-]/gi, "");
-        let config;
-        try {
-          config = JSON.parse(raw);
-        } catch(e) {
-          showToast("⚠️ JSON ไม่ถูกต้อง ลองก็อปปี้ใหม่");
-          return;
-        }
-        if (!config.databaseURL) {
-          showToast("⚠️ ต้องมี databaseURL ใน config");
-          return;
-        }
-        showToast("🔥 กำลังเชื่อมต่อ...");
-        firebaseConfig = config;
-        ls("debt_firebase_config", JSON.stringify(config));
-        ls("debt_room_key", room);
-        const ok = await initFirebase(config, room);
-        if (ok) {
-          showToast("✅ เชื่อมต่อ Firebase แล้ว!");
-          showScreen("screen-select");
-          renderSelect();
-        }
-      }
-      function skipSetup() {
-        showScreen("screen-select");
-        renderSelect();
-      }
-
-      // ── Utils ─────────────────────────────────────────────────────
-      function fmt(n) {
-        return "฿" + Math.abs(n).toLocaleString("th-TH");
-      }
-      function thaiDate(ts) {
-        return new Date(ts).toLocaleString("th-TH", {
-          timeZone: "Asia/Bangkok",
-          day: "numeric",
-          month: "short",
-          year: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-      }
-      function showToast(msg, dur = 2600) {
-        const t = document.getElementById("toast");
-        t.textContent = msg;
-        t.classList.add("show");
-        clearTimeout(t._t);
-        t._t = setTimeout(() => t.classList.remove("show"), dur);
-      }
-      function getDebt(f, t) {
-        return (db.debts[f] && db.debts[f][t]) || 0;
-      }
-      function setDebt(f, t, v) {
-        if (!db.debts[f]) db.debts[f] = {};
-        db.debts[f][t] = Math.max(0, v);
-      }
-      function addDebtRaw(f, t, d) {
-        setDebt(f, t, getDebt(f, t) + d);
-      }
-      function newId() {
-        return Date.now() * 1000 + Math.floor(Math.random() * 999);
-      }
-
-      // ── Avatar helpers ────────────────────────────────────────────
-      // Returns inline HTML for an avatar: photo if available, else emoji
-      // size: px number, border: css string or ''
-      function avatarHTML(u, sizePx, extraStyle = "") {
-        if (u.photo) {
-          return `<img src="${u.photo}" class="avatar-img" style="width:${sizePx}px;height:${sizePx}px;${extraStyle}" alt="${u.name}">`;
-        }
-        return `<span style="font-size:${Math.round(sizePx * 0.5)}px;line-height:1;${extraStyle}">${u.emoji || "😊"}</span>`;
-      }
-
-      // Resize + compress photo to base64, max 200px, quality 0.7
-      function compressImage(file, maxPx = 200, quality = 0.72) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-              const scale = Math.min(
-                1,
-                maxPx / Math.max(img.width, img.height),
-              );
-              const w = Math.round(img.width * scale),
-                h = Math.round(img.height * scale);
-              const canvas = document.createElement("canvas");
-              canvas.width = w;
-              canvas.height = h;
-              canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-              resolve(canvas.toDataURL("image/jpeg", quality));
-            };
-            img.onerror = reject;
-            img.src = e.target.result;
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      }
-
-      // ── Screens ───────────────────────────────────────────────────
+      // ---------- UI RENDER ----------
       function showScreen(id) {
-        document
-          .querySelectorAll(".screen")
-          .forEach((s) => s.classList.remove("active"));
-        document.getElementById(id).classList.add("active");
-        if (id === "screen-setup") renderSetupScreen();
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(id === 'screen-dashboard' && currentUser) renderDash();
+        if(id === 'screen-detail' && currentDetail) renderDetail();
+        if(id === 'screen-select') renderSelect();
+        if(id === 'screen-setup') { renderSetupUserList(); renderActivityLog(); }
       }
-
-      // ── Select Screen ─────────────────────────────────────────────
-      const THEMES = {
-        pp: "theme-pp",
-        ern: "theme-ern",
-        kung: "theme-kung",
-        ice: "theme-ice",
-      };
-
+      function refreshUI() {
+        if(document.getElementById('screen-select').classList.contains('active')) renderSelect();
+        if(document.getElementById('screen-dashboard').classList.contains('active') && currentUser) renderDash();
+        if(document.getElementById('screen-detail').classList.contains('active') && currentDetail) renderDetail();
+        if(document.getElementById('screen-setup').classList.contains('active')) { renderSetupUserList(); renderActivityLog(); }
+      }
       function renderSelect() {
-        const grid = document.getElementById("user-grid");
-        grid.innerHTML = "";
-        setSyncUI(
-          firebaseRef ? "ok" : "off",
-          firebaseRef ? "✅ เชื่อมต่อแล้ว" : "ไม่ได้เชื่อมต่อ",
-          !!firebaseRef
-        );
-        Object.values(db.users).forEach((u, i) => {
-          const owe = Object.values(db.debts[u.id] || {}).reduce(
-            (a, b) => a + b,
-            0,
-          );
-          const owed = Object.keys(db.users)
-            .filter((k) => k !== u.id)
-            .reduce((a, k) => a + getDebt(k, u.id), 0);
-          const net = owed - owe;
-          const card = document.createElement("div");
-          card.className = `user-card ${THEMES[u.id] || ""} fade-up`;
-          card.style.animationDelay = i * 0.08 + "s";
-          const bgStyle = u.photo
-            ? `background:url(${u.photo}) center/cover no-repeat; opacity:0.75;`
-            : "";
+        let grid = document.getElementById('user-grid');
+        grid.innerHTML = '';
+        Object.values(db.users).forEach(u => {
+          let owed = Object.keys(db.users).filter(k=>k!==u.id).reduce((a,k)=>a+getDebt(k,u.id),0);
+          let owe = Object.values(db.debts[u.id]||{}).reduce((a,b)=>a+b,0);
+          let net = owed - owe;
+          let card = document.createElement('div');
+          card.className = 'user-card';
           card.innerHTML = `
-      <div class="user-card-bg" style="${bgStyle}"></div>
-      <div class="user-card-overlay"></div>
-      <div class="user-card-content">
-        <div class="user-avatar-circle" style="${u.photo ? "overflow:hidden;padding:0;border:2px solid rgba(255,255,255,.5);" : ""}">
-          ${u.photo ? `<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;" alt="${u.name}">` : u.emoji}
-        </div>
-        <div class="user-card-name">${u.name}</div>
-        <div class="user-card-sub">${net >= 0 ? "💰 มีคนติดหนี้" : "😰 มีหนี้ค้าง"}</div>
-      </div>
-      <div class="user-card-badge ${net >= 0 ? "badge-green" : "badge-red"}">${net >= 0 ? "+" : ""}${fmt(net)}</div>`;
-          card.onclick = () => {
-            currentUser = u.id;
-            renderDash();
-            showScreen("screen-dashboard");
-          };
+            <div class="user-avatar">${u.photo ? `<img src="${u.photo}">` : u.emoji}</div>
+            <div class="user-name">${u.name}</div>
+            <div class="user-balance ${net>=0?'positive':'negative'}">${net>=0?'+':''}${fmt(Math.abs(net))}</div>
+          `;
+          card.onclick = () => { currentUser = u.id; showScreen('screen-dashboard'); };
           grid.appendChild(card);
         });
+        let syncDot = document.getElementById('sync-dot');
+        if(firebaseRef) { syncDot.className = 'sync-dot online'; document.getElementById('sync-label').innerText = 'เชื่อมต่อออนไลน์'; }
+        else { syncDot.className = 'sync-dot offline'; document.getElementById('sync-label').innerText = 'ออฟไลน์ (เฉพาะเครื่อง)'; }
       }
-
-      // ── Dashboard ─────────────────────────────────────────────────
       function renderDash() {
-        const u = db.users[currentUser];
-        // dash avatar: photo or emoji
-        const dashAv = document.getElementById("dash-avatar-emoji");
-        if (u.photo) {
-          dashAv.style.display = "none";
-          let existingImg = document.getElementById("dash-avatar-img");
-          if (!existingImg) {
-            existingImg = document.createElement("img");
-            existingImg.id = "dash-avatar-img";
-            existingImg.style.cssText =
-              "width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0;";
-            dashAv.parentNode.insertBefore(existingImg, dashAv);
+        let u = db.users[currentUser];
+        let dashAv = document.getElementById('dash-avatar');
+        if(u.photo) dashAv.innerHTML = `<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        else dashAv.innerHTML = u.emoji;
+        document.getElementById('dash-name').innerText = u.name;
+        let owe = Object.values(db.debts[currentUser]||{}).reduce((a,b)=>a+b,0);
+        let owed = Object.keys(db.users).filter(k=>k!==currentUser).reduce((a,k)=>a+getDebt(k,currentUser),0);
+        document.getElementById('stat-owe').innerText = fmt(owe);
+        document.getElementById('stat-owed').innerText = fmt(owed);
+        let net = owed-owe;
+        document.getElementById('dash-net-badge').innerHTML = `<span class="badge ${net>=0?'positive':'negative'}">${net>=0?'💰 ได้สุทธิ ':'📉 ติดสุทธิ '}${fmt(Math.abs(net))}</span>`;
+        let iOweDiv = document.getElementById('list-i-owe');
+        iOweDiv.innerHTML = '';
+        for(let [toId,amt] of Object.entries(db.debts[currentUser]||{})) {
+          if(amt<=0) continue;
+          let target = db.users[toId];
+          iOweDiv.innerHTML += `<div class="debt-item" onclick="openDetail('${currentUser}','${toId}')"><div><span style="font-size:1.2rem;">${target.photo ? '📷' : target.emoji}</span> ${target.name}</div><div style="color:#ff5a7a;">${fmt(amt)}</div><div>›</div></div>`;
+        }
+        let oweMeDiv = document.getElementById('list-owe-me');
+        oweMeDiv.innerHTML = '';
+        for(let [fromId,amt] of Object.entries(db.debts).flatMap(([f,obj])=>Object.entries(obj).map(([t,a])=>[f,t,a]))) {
+          if(amt>0 && fromId !== currentUser && amt>0 && t === currentUser) {
+            let debtor = db.users[fromId];
+            oweMeDiv.innerHTML += `<div class="debt-item" onclick="openDetail('${fromId}','${currentUser}')"><div><span style="font-size:1.2rem;">${debtor.photo ? '📷' : debtor.emoji}</span> ${debtor.name}</div><div style="color:#2affa8;">${fmt(amt)}</div><div>›</div></div>`;
           }
-          existingImg.src = u.photo;
-          existingImg.style.display = "";
-        } else {
-          dashAv.textContent = u.emoji;
-          dashAv.style.display = "";
-          const existingImg = document.getElementById("dash-avatar-img");
-          if (existingImg) existingImg.style.display = "none";
         }
-        document.getElementById("dash-name").textContent = u.name;
-
-        const owe = Object.values(db.debts[currentUser] || {}).reduce(
-          (a, b) => a + b,
-          0,
-        );
-        const owed = Object.keys(db.users)
-          .filter((k) => k !== currentUser)
-          .reduce((a, k) => a + getDebt(k, currentUser), 0);
-        const net = owed - owe;
-        document.getElementById("stat-owe").textContent = fmt(owe);
-        document.getElementById("stat-owed").textContent = fmt(owed);
-        const nb = document.getElementById("dash-net-badge");
-        nb.innerHTML =
-          net > 0
-            ? `<span class="net-badge owed">📈 ได้สุทธิ ${fmt(net)}</span>`
-            : net < 0
-              ? `<span class="net-badge owe">📉 ติดสุทธิ ${fmt(-net)}</span>`
-              : `<span class="net-badge clear">✨ เสมอกัน</span>`;
-
-        // I owe
-        const li = document.getElementById("list-i-owe");
-        li.innerHTML = "";
-        const myDebts = Object.entries(db.debts[currentUser] || {}).filter(
-          ([, v]) => v > 0,
-        );
-        if (!myDebts.length)
-          li.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:.9rem;">🎉 ไม่มีหนี้!</div>`;
-        else
-          myDebts.forEach(([toId, amt]) =>
-            li.appendChild(
-              makeDebtItem(toId, amt, "debt", () =>
-                openDetail(currentUser, toId),
-              ),
-            ),
-          );
-
-        // Owe me
-        const lm = document.getElementById("list-owe-me");
-        lm.innerHTML = "";
-        const debtors = Object.keys(db.users).filter(
-          (k) => k !== currentUser && getDebt(k, currentUser) > 0,
-        );
-        if (!debtors.length)
-          lm.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:.9rem;">ยังไม่มีลูกหนี้</div>`;
-        else
-          debtors.forEach((f) =>
-            lm.appendChild(
-              makeDebtItem(f, getDebt(f, currentUser), "credit", () =>
-                openDetail(f, currentUser),
-              ),
-            ),
-          );
+        if(iOweDiv.innerHTML === '') iOweDiv.innerHTML = '<div style="padding:12px; text-align:center; opacity:0.6;">✨ ไม่มีหนี้จ้า</div>';
+        if(oweMeDiv.innerHTML === '') oweMeDiv.innerHTML = '<div style="padding:12px; text-align:center; opacity:0.6;">😎 ยังไม่มีคนเป็นหนี้</div>';
       }
-
-      function makeDebtItem(personId, amt, type, onclick) {
-        const u = db.users[personId];
-        const d = document.createElement("div");
-        d.className = `debt-item ${type === "debt" ? "debt-type" : "credit-type"}`;
-        const avContent = u.photo
-          ? `<img src="${u.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${u.name}">`
-          : u.emoji;
-        d.innerHTML = `
-    <div class="debt-person-avatar" style="${u.photo ? "" : "background:" + u.color + "22;"} overflow:hidden;">${avContent}</div>
-    <div class="debt-info">
-      <div class="debt-person-name">${u.name}</div>
-      <div class="debt-desc">${type === "debt" ? "ฉันเป็นหนี้" : "เป็นหนี้ฉัน"}</div>
-    </div>
-    <div class="debt-amount ${type === "debt" ? "red" : "green"}">${fmt(amt)}</div>
-    <div style="color:var(--text-muted);font-size:.8rem;">›</div>`;
-        d.onclick = onclick;
-        return d;
-      }
-
-      // ── Add Debtor from Dashboard ─────────────────────────────────
-      function openAddDebtorModal() {
-        selectedDebtor = null;
-        document.getElementById("debtor-amount").value = "";
-        document.getElementById("debtor-note").value = "";
-        const list = document.getElementById("debtor-person-list");
-        list.innerHTML = "";
-        Object.values(db.users)
-          .filter((u) => u.id !== currentUser)
-          .forEach((u) => {
-            const d = document.createElement("div");
-            d.className = "checkbox-item";
-            d.innerHTML = `<div class="checkbox-box"></div><div class="checkbox-avatar">${u.emoji}</div><div class="checkbox-name">${u.name}</div>`;
-            d.onclick = () => {
-              selectedDebtor = u.id;
-              list.querySelectorAll(".checkbox-item").forEach((x) => {
-                x.classList.remove("selected");
-                x.querySelector(".checkbox-box").textContent = "";
-              });
-              d.classList.add("selected");
-              d.querySelector(".checkbox-box").textContent = "✓";
-            };
-            list.appendChild(d);
-          });
-        openModal("modal-add-debtor");
-      }
-
-      function confirmAddDebtor() {
-        if (!selectedDebtor) {
-          showToast("⚠️ เลือกคนก่อน");
-          return;
-        }
-        const amt = parseFloat(document.getElementById("debtor-amount").value);
-        if (!amt || amt <= 0) {
-          showToast("⚠️ ใส่จำนวนเงิน");
-          return;
-        }
-        const note =
-          document.getElementById("debtor-note").value || "เพิ่มหนี้";
-        addDebtRaw(selectedDebtor, currentUser, amt);
-        db.history.push({
-          id: newId(),
-          from: selectedDebtor,
-          to: currentUser,
-          type: "add",
-          amount: amt,
-          note,
-          ts: Date.now(),
-        });
-        saveAndSync();
-        closeModal("modal-add-debtor");
-        renderDash();
-        showToast(`✅ เพิ่มหนี้ ${db.users[selectedDebtor].name} แล้ว!`);
-      }
-
-      // ── Detail ────────────────────────────────────────────────────
-      function openDetail(fromId, toId) {
-        currentDetail = { from: fromId, to: toId };
+      function openDetail(from, to) {
+        currentDetail = { from, to };
         renderDetail();
-        showScreen("screen-detail");
+        showScreen('screen-detail');
       }
-
+      function goBackFromDetail() { showScreen('screen-dashboard'); renderDash(); }
       function renderDetail() {
-        const { from, to } = currentDetail;
-        const fU = db.users[from],
-          tU = db.users[to];
-        const amt = getDebt(from, to);
-        const iAmFrom = from === currentUser;
-
-        const detU = iAmFrom ? tU : fU;
-        const detAvEl = document.getElementById("detail-avatar");
-        if (detU.photo) {
-          detAvEl.innerHTML = `<img src="${detU.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${detU.name}">`;
-          detAvEl.style.overflow = "hidden";
-          detAvEl.style.padding = "0";
+        let { from, to } = currentDetail;
+        let fUser = db.users[from], tUser = db.users[to];
+        let amount = getDebt(from, to);
+        let isIOwe = (from === currentUser);
+        let detAvatar = document.getElementById('detail-avatar');
+        let targetUser = isIOwe ? tUser : fUser;
+        if(targetUser.photo) detAvatar.innerHTML = `<img src="${targetUser.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        else detAvatar.innerHTML = targetUser.emoji;
+        document.getElementById('detail-name').innerHTML = isIOwe ? tUser.name : fUser.name;
+        document.getElementById('detail-amount').innerHTML = fmt(amount);
+        document.getElementById('detail-amount').style.color = isIOwe ? '#ff5a7a' : '#2affa8';
+        document.getElementById('detail-direction').innerHTML = isIOwe ? `${fUser.name} เป็นหนี้ ${tUser.name}` : `${fUser.name} เป็นหนี้คุณ`;
+        let actionsDiv = document.getElementById('detail-actions');
+        actionsDiv.innerHTML = '';
+        if(isIOwe) {
+          actionsDiv.innerHTML = `<button class="btn btn-success" onclick="openPayModal()" ${amount<=0?'disabled style="opacity:0.5;"':''}>💸 จ่ายหนี้</button>`;
         } else {
-          detAvEl.textContent = detU.emoji;
-          detAvEl.style.overflow = "";
-          detAvEl.style.padding = "";
+          actionsDiv.innerHTML = `<button class="btn btn-danger" onclick="openAddDebtModal()">➕ เพิ่มหนี้</button>`;
         }
-        document.getElementById("detail-name").textContent = iAmFrom
-          ? tU.name
-          : fU.name;
-        document.getElementById("detail-amount").textContent = fmt(amt);
-        document.getElementById("detail-amount").className =
-          `detail-amount-big ${iAmFrom ? "red" : "green"}`;
-        document.getElementById("detail-direction").textContent = iAmFrom
-          ? `${fU.name} เป็นหนี้ ${tU.name}`
-          : `${fU.name} เป็นหนี้คุณ`;
-        document.getElementById("detail-header").style.background =
-          `linear-gradient(135deg,${(iAmFrom ? tU : fU).color}30 0%,transparent 60%)`;
-
-        // Buttons — always show regardless of amt=0
-        const acts = document.getElementById("detail-actions");
-        acts.innerHTML = "";
-        if (iAmFrom) {
-          const b = document.createElement("button");
-          b.className = "btn btn-success";
-          b.innerHTML = "💸 จ่ายหนี้";
-          b.disabled = amt <= 0;
-          b.style.opacity = amt <= 0 ? "0.4" : "1";
-          b.onclick = openPayModal;
-          acts.appendChild(b);
-        } else {
-          const b = document.createElement("button");
-          b.className = "btn btn-danger";
-          b.innerHTML = "➕ เพิ่มหนี้";
-          b.onclick = openAddDebtModal;
-          acts.appendChild(b);
-        }
-
-        // History
-        const hist = document.getElementById("detail-history");
-        hist.innerHTML = "";
-        const items = db.history
-          .filter((h) => h.from === from && h.to === to)
-          .sort((a, b) => b.ts - a.ts);
-        if (!items.length) {
-          hist.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:.88rem;">ยังไม่มีประวัติ</div>`;
-          return;
-        }
-        items.forEach((h) => {
-          const d = document.createElement("div");
-          d.className = "history-item";
-          const icon =
-            h.type === "pay" ? "💸" : h.type === "split" ? "🍻" : "➕";
-          const cls =
-            h.type === "pay" ? "pay" : h.type === "split" ? "split" : "add";
-          const sign = h.type === "pay" ? "-" : "+";
-          d.innerHTML = `
-      <div class="history-icon ${cls}">${icon}</div>
-      <div class="history-info">
-        <div class="history-note">${h.note || (h.type === "pay" ? "จ่ายหนี้" : h.type === "split" ? "หารบิล" : "เพิ่มหนี้")}</div>
-        <div class="history-date">${thaiDate(h.ts)}${h.method ? " · " + (h.method === "transfer" ? "📲 อัพสลีฟ" : "💵 เงินสด") : ""}</div>
-      </div>
-      <div class="history-amount ${cls === "pay" ? "pay" : "add"}">${sign}${fmt(h.amount)}</div>`;
-          hist.appendChild(d);
+        let historyDiv = document.getElementById('detail-history');
+        historyDiv.innerHTML = '';
+        let hist = db.history.filter(h => (h.from===from && h.to===to)).sort((a,b)=>b.ts - a.ts);
+        if(hist.length===0) historyDiv.innerHTML = '<div style="text-align:center; opacity:0.6;">ไม่มีประวัติ</div>';
+        hist.forEach(h=>{
+          let sign = h.type==='pay' ? '-' : '+';
+          let color = h.type==='pay' ? '#2affa8' : '#ff5a7a';
+          historyDiv.innerHTML += `<div class="debt-item"><div><span style="font-size:1.2rem;">${h.type==='pay'?'💸':'➕'}</span> ${h.note || (h.type==='pay'?'จ่ายหนี้':'เพิ่มหนี้')}</div><div style="color:${color};">${sign}${fmt(h.amount)}</div><div style="font-size:0.7rem;">${thaiDate(h.ts)}</div></div>`;
         });
       }
-
-      // ── Pay ───────────────────────────────────────────────────────
-      function openPayModal() {
-        const { from, to } = currentDetail;
-        document.getElementById("pay-info-box").innerHTML =
-          `เป็นหนี้ <b>${db.users[to].name}</b> อยู่ <b style="color:var(--red);">${fmt(getDebt(from, to))}</b>`;
-        document.getElementById("pay-amount").value = "";
-        document.getElementById("pay-note").value = "";
-        payMethod = "cash";
-        selectPayMethod("cash");
-        openModal("modal-pay");
-      }
-      function selectPayMethod(m) {
-        payMethod = m;
-        document
-          .getElementById("pay-method-cash")
-          .classList.toggle("active", m === "cash");
-        document
-          .getElementById("pay-method-transfer")
-          .classList.toggle("active", m === "transfer");
-      }
+      function openPayModal() { document.getElementById('pay-info-box').innerHTML = `เป็นหนี้ ${db.users[currentDetail.to].name} อยู่ ${fmt(getDebt(currentDetail.from, currentDetail.to))}`; document.getElementById('pay-amount').value=''; document.getElementById('pay-note').value=''; openModal('modal-pay'); }
       function confirmPay() {
-        const amt = parseFloat(document.getElementById("pay-amount").value);
-        if (!amt || amt <= 0) {
-          showToast("⚠️ ใส่จำนวนเงิน");
-          return;
-        }
-        const max = getDebt(currentDetail.from, currentDetail.to);
-        if (amt > max) {
-          showToast(`⚠️ จ่ายได้สูงสุด ${fmt(max)}`);
-          return;
-        }
-        const { from, to } = currentDetail;
-        addDebtRaw(from, to, -amt);
-        db.history.push({
-          id: newId(),
-          from,
-          to,
-          type: "pay",
-          amount: amt,
-          note: document.getElementById("pay-note").value || "จ่ายหนี้",
-          method: payMethod,
-          ts: Date.now(),
-        });
+        let amt = parseFloat(document.getElementById('pay-amount').value);
+        if(amt<=0) return showToast("ใส่จำนวนเงิน");
+        let max = getDebt(currentDetail.from, currentDetail.to);
+        if(amt>max) return showToast(`จ่ายได้สูงสุด ${fmt(max)}`);
+        addDebtRaw(currentDetail.from, currentDetail.to, -amt);
+        db.history.push({ id: Date.now(), from: currentDetail.from, to: currentDetail.to, type: 'pay', amount: amt, note: document.getElementById('pay-note').value||'จ่ายหนี้', ts: Date.now() });
         saveAndSync();
-        closeModal("modal-pay");
+        closeModal('modal-pay');
         renderDetail();
-        showToast("✅ บันทึกการจ่ายแล้ว!");
+        showToast("✅ จ่ายหนี้สำเร็จ");
       }
-
-      // ── Add Debt (detail, creditor side) ─────────────────────────
-      function openAddDebtModal() {
-        document.getElementById("add-debt-title").textContent =
-          `➕ เพิ่มหนี้ของ ${db.users[currentDetail.from].name}`;
-        document.getElementById("add-debt-amount").value = "";
-        document.getElementById("add-debt-note").value = "";
-        openModal("modal-add-debt");
-      }
+      function openAddDebtModal() { document.getElementById('add-debt-amount').value=''; document.getElementById('add-debt-note').value=''; openModal('modal-add-debt'); }
       function confirmAddDebt() {
-        const amt = parseFloat(
-          document.getElementById("add-debt-amount").value,
-        );
-        if (!amt || amt <= 0) {
-          showToast("⚠️ ใส่จำนวนเงิน");
-          return;
-        }
-        const { from, to } = currentDetail;
-        addDebtRaw(from, to, amt);
-        db.history.push({
-          id: newId(),
-          from,
-          to,
-          type: "add",
-          amount: amt,
-          note: document.getElementById("add-debt-note").value || "เพิ่มหนี้",
-          ts: Date.now(),
+        let amt = parseFloat(document.getElementById('add-debt-amount').value);
+        if(amt<=0) return showToast("ใส่จำนวนเงิน");
+        addDebtRaw(currentDetail.from, currentDetail.to, amt);
+        db.history.push({ id: Date.now(), from: currentDetail.from, to: currentDetail.to, type: 'add', amount: amt, note: document.getElementById('add-debt-note').value||'เพิ่มหนี้', ts: Date.now() });
+        saveAndSync();
+        closeModal('modal-add-debt');
+        renderDetail();
+        showToast("✅ เพิ่มหนี้เรียบร้อย");
+      }
+      function openAddDebtorModal() {
+        let listDiv = document.getElementById('debtor-person-list');
+        listDiv.innerHTML = '';
+        Object.values(db.users).filter(u=>u.id !== currentUser).forEach(u=>{
+          let div = document.createElement('div');
+          div.className = 'checkbox-item';
+          div.setAttribute('data-id', u.id);
+          div.innerHTML = `<div class="checkbox-box">⬜</div><div>${u.emoji} ${u.name}</div>`;
+          div.onclick = function() { document.querySelectorAll('#debtor-person-list .checkbox-item').forEach(x=>x.classList.remove('selected')); this.classList.add('selected'); window.selectedDebtorId = u.id; };
+          listDiv.appendChild(div);
+        });
+        document.getElementById('debtor-amount').value=''; document.getElementById('debtor-note').value='';
+        openModal('modal-add-debtor');
+      }
+      function confirmAddDebtor() {
+        let selected = document.querySelector('#debtor-person-list .checkbox-item.selected');
+        if(!selected) return showToast("เลือกคนก่อน");
+        let debtorId = selected.getAttribute('data-id');
+        let amt = parseFloat(document.getElementById('debtor-amount').value);
+        if(amt<=0) return showToast("ใส่จำนวนเงิน");
+        addDebtRaw(debtorId, currentUser, amt);
+        db.history.push({ id: Date.now(), from: debtorId, to: currentUser, type: 'add', amount: amt, note: document.getElementById('debtor-note').value||'เพิ่มลูกหนี้', ts: Date.now() });
+        saveAndSync();
+        closeModal('modal-add-debtor');
+        renderDash();
+        showToast(`✅ ${db.users[debtorId].name} เป็นหนี้คุณ ${fmt(amt)}`);
+      }
+      function openSplit(fromDash) {
+        splitFromDash = fromDash;
+        splitPayer = null; splitPeople = [];
+        document.getElementById('split-total').value = '';
+        document.getElementById('split-note').value = '';
+        document.getElementById('split-preview').style.display = 'none';
+        renderSplitLists();
+        showScreen('screen-split');
+        document.getElementById('split-back-btn').onclick = () => { if(splitFromDash) showScreen('screen-dashboard'); else showScreen('screen-select'); };
+      }
+      function renderSplitLists() {
+        let payerDiv = document.getElementById('split-payer-list');
+        let peopleDiv = document.getElementById('split-people-list');
+        payerDiv.innerHTML = ''; peopleDiv.innerHTML = '';
+        Object.values(db.users).forEach(u => {
+          let payerItem = document.createElement('div');
+          payerItem.className = `checkbox-item ${splitPayer===u.id?'selected':''}`;
+          payerItem.innerHTML = `<div class="checkbox-box">${splitPayer===u.id?'✓':'⬜'}</div><div>${u.photo ? '📷' : u.emoji} ${u.name}</div>`;
+          payerItem.onclick = () => { splitPayer = u.id; renderSplitLists(); updateSplitPreview(); };
+          payerDiv.appendChild(payerItem);
+          let peopleItem = document.createElement('div');
+          peopleItem.className = `checkbox-item ${splitPeople.includes(u.id)?'selected':''}`;
+          peopleItem.innerHTML = `<div class="checkbox-box">${splitPeople.includes(u.id)?'✓':'⬜'}</div><div>${u.photo ? '📷' : u.emoji} ${u.name}</div>`;
+          peopleItem.onclick = () => { if(splitPeople.includes(u.id)) splitPeople = splitPeople.filter(id=>id!==u.id); else splitPeople.push(u.id); renderSplitLists(); updateSplitPreview(); };
+          peopleDiv.appendChild(peopleItem);
+        });
+      }
+      function updateSplitPreview() {
+        let total = parseFloat(document.getElementById('split-total').value);
+        let previewDiv = document.getElementById('split-preview');
+        if(!total || !splitPayer || splitPeople.length===0) { previewDiv.style.display='none'; return; }
+        let perHead = Math.ceil(total / splitPeople.length);
+        let html = `<div style="margin-bottom:8px;">💸 ยอดรวม ${fmt(total)} ÷ ${splitPeople.length} คน = <strong style="color:#ffd060;">${fmt(perHead)}</strong> ต่อหัว</div>`;
+        splitPeople.forEach(p => {
+          if(p !== splitPayer) html += `<div>→ ${db.users[p].emoji} ${db.users[p].name} เป็นหนี้ ${db.users[splitPayer].emoji} ${db.users[splitPayer].name} ${fmt(perHead)}</div>`;
+          else html += `<div>✅ ${db.users[p].name} (ผู้จ่าย) ไม่ต้องจ่ายเพิ่ม</div>`;
+        });
+        previewDiv.innerHTML = html;
+        previewDiv.style.display = 'block';
+      }
+      function confirmSplit() {
+        let total = parseFloat(document.getElementById('split-total').value);
+        let note = document.getElementById('split-note').value || "หารบิล";
+        if(!total || total<=0) return showToast("ใส่ยอดบิล");
+        if(!splitPayer) return showToast("เลือกผู้จ่าย");
+        if(splitPeople.length<2) return showToast("ต้องมีคนหารอย่างน้อย 2 คน");
+        let perHead = Math.ceil(total / splitPeople.length);
+        let ts = Date.now();
+        splitPeople.forEach(p => {
+          if(p !== splitPayer) {
+            addDebtRaw(p, splitPayer, perHead);
+            db.history.push({ id: ts+Math.random(), from: p, to: splitPayer, type: 'split', amount: perHead, note, ts });
+          }
         });
         saveAndSync();
-        closeModal("modal-add-debt");
-        renderDetail();
-        showToast("✅ เพิ่มหนี้แล้ว!");
+        showToast(`✅ หารเสร็จ! คนละ ${fmt(perHead)}`);
+        if(splitFromDash) showScreen('screen-dashboard');
+        else showScreen('screen-select');
+        renderSelect();
+        if(currentUser) renderDash();
       }
 
-      // ── Edit Profile ──────────────────────────────────────────────
-      function openEditProfile() {
-        const u = db.users[currentUser];
-        document.getElementById("edit-name").value = u.name;
-        selectedEmoji = u.emoji;
-        pendingPhoto = u.photo || null;
-        // reset file input
-        document.getElementById("profile-file-input").value = "";
-        // show existing photo or placeholder
-        _refreshPhotoPreview();
-        const grid = document.getElementById("emoji-grid");
-        grid.innerHTML = "";
-        EMOJIS.forEach((em) => {
-          const d = document.createElement("div");
-          d.className = `emoji-opt ${em === u.emoji ? "selected" : ""}`;
-          d.textContent = em;
-          d.onclick = () => {
-            selectedEmoji = em;
-            grid
-              .querySelectorAll(".emoji-opt")
-              .forEach((x) => x.classList.remove("selected"));
-            d.classList.add("selected");
-          };
-          grid.appendChild(d);
+      // ---------- USER MANAGEMENT ----------
+      function renderSetupUserList() {
+        let listDiv = document.getElementById('setup-user-list');
+        listDiv.innerHTML = '';
+        Object.values(db.users).forEach(u=>{
+          listDiv.innerHTML += `<div class="flex-between" style="margin-bottom:10px; background:#1a1a26; padding:10px; border-radius:16px;"><div><span style="font-size:1.3rem;">${u.photo?'📷':u.emoji}</span> ${u.name}</div><button onclick="prepareDeleteUser('${u.id}')" class="btn btn-danger" style="padding:4px 12px;">🗑️ ลบ</button></div>`;
         });
-        openModal("modal-edit-profile");
       }
-
-      let pendingPhoto = null;
-      let newUserPendingPhoto = null;
-
-      function _refreshPhotoPreview() {
-        const wrap = document.getElementById("profile-photo-preview-wrap");
-        const removeBtn = document.getElementById("remove-photo-btn");
-        if (!wrap) return;
-        if (pendingPhoto) {
-          wrap.innerHTML = `<img src="${pendingPhoto}" class="upload-preview" alt="preview">
-      <div class="upload-label" style="font-size:.75rem;">แตะเพื่อเปลี่ยนรูป</div>`;
-          if (removeBtn) removeBtn.style.display = "";
-        } else {
-          wrap.innerHTML = `<div id="profile-photo-placeholder" style="font-size:3rem;margin-bottom:8px;">📷</div>
-      <div class="upload-label">แตะเพื่อเลือกรูป<br><span style="font-size:.72rem;opacity:.6;">JPG, PNG, HEIC — ปรับขนาดอัตโนมัติ</span></div>`;
-          if (removeBtn) removeBtn.style.display = "none";
-        }
+      function prepareDeleteUser(id) { window.deleteUserId = id; let u = db.users[id]; document.getElementById('del-user-info').innerHTML = `⚠️ ลบ "${u.name}" จะลบประวัติและหนี้ทั้งหมดด้วย!`; openModal('modal-del-user'); }
+      function confirmDelUser() {
+        let id = window.deleteUserId;
+        if(!id) return;
+        delete db.users[id];
+        delete db.debts[id];
+        Object.keys(db.debts).forEach(k=>{ if(db.debts[k][id]) delete db.debts[k][id]; });
+        db.history.push({ id: Date.now(), type: 'user-del', note: `ลบผู้ใช้ ${id}`, ts: Date.now() });
+        saveAndSync();
+        closeModal('modal-del-user');
+        renderSetupUserList();
+        renderSelect();
+        if(currentUser === id) { currentUser = null; showScreen('screen-select'); }
+        showToast("🗑️ ลบผู้ใช้แล้ว");
       }
-
-      async function handleProfilePhoto(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        try {
-          pendingPhoto = await compressImage(file, 300, 0.75);
-          _refreshPhotoPreview();
-          showToast("📷 เลือกรูปแล้ว กด บันทึก เพื่อยืนยัน");
-        } catch (err) {
-          showToast("⚠️ โหลดรูปไม่ได้");
-        }
+      let newUserEmoji = "😎", newUserColor = "#7c6aff";
+      function openAddUserModal() {
+        newUserEmoji = "😎"; newUserColor = "#7c6aff";
+        document.getElementById('new-user-name').value = '';
+        let emojiGrid = document.getElementById('new-user-emoji-grid');
+        emojiGrid.innerHTML = '';
+        EMOJIS.forEach(em=>{ let d=document.createElement('div'); d.className=`emoji-opt ${em===newUserEmoji?'selected':''}`; d.innerText=em; d.onclick=()=>{ newUserEmoji=em; document.querySelectorAll('#new-user-emoji-grid .emoji-opt').forEach(x=>x.classList.remove('selected')); d.classList.add('selected'); }; emojiGrid.appendChild(d); });
+        let colorGrid = document.getElementById('new-user-color-grid');
+        colorGrid.innerHTML = '';
+        COLORS.forEach(c=>{ let d=document.createElement('div'); d.className=`color-dot ${c===newUserColor?'selected':''}`; d.style.backgroundColor=c; d.onclick=()=>{ newUserColor=c; document.querySelectorAll('#new-user-color-grid .color-dot').forEach(x=>x.classList.remove('selected')); d.classList.add('selected'); }; colorGrid.appendChild(d); });
+        openModal('modal-add-user');
       }
-
-      function removeProfilePhoto() {
-        pendingPhoto = null;
-        document.getElementById("profile-file-input").value = "";
-        _refreshPhotoPreview();
-        showToast("🗑️ ลบรูปแล้ว");
+      function confirmAddUser() {
+        let name = document.getElementById('new-user-name').value.trim();
+        if(!name) return showToast("กรอกชื่อ");
+        let id = name.toLowerCase().replace(/[^a-z0-9]/g,'') + Date.now().toString().slice(-4);
+        db.users[id] = { id, name, emoji: newUserEmoji, color: newUserColor, photo: null };
+        db.debts[id] = {};
+        db.history.push({ id: Date.now(), type: 'user-add', note: `เพิ่มผู้ใช้ ${name}`, ts: Date.now() });
+        saveAndSync();
+        closeModal('modal-add-user');
+        renderSetupUserList();
+        renderSelect();
+        showToast(`✅ เพิ่ม ${name} เรียบร้อย`);
+      }
+      function openEditProfile() {
+        let u = db.users[currentUser];
+        document.getElementById('edit-name').value = u.name;
+        let grid = document.getElementById('edit-emoji-grid');
+        grid.innerHTML = '';
+        EMOJIS.forEach(em=>{ let d=document.createElement('div'); d.className=`emoji-opt ${em===u.emoji?'selected':''}`; d.innerText=em; d.onclick=()=>{ window.newEmoji=em; document.querySelectorAll('#edit-emoji-grid .emoji-opt').forEach(x=>x.classList.remove('selected')); d.classList.add('selected'); }; grid.appendChild(d); });
+        window.newEmoji = u.emoji;
+        openModal('modal-edit-profile');
       }
       function saveProfile() {
-        const name = document.getElementById("edit-name").value.trim();
-        if (!name) {
-          showToast("⚠️ ใส่ชื่อด้วย");
-          return;
-        }
-        db.users[currentUser].name = name;
-        db.users[currentUser].emoji =
-          selectedEmoji || db.users[currentUser].emoji;
-        // pendingPhoto: null = remove, string = set, undefined = keep (won't happen since we always set)
-        if (pendingPhoto !== undefined)
-          db.users[currentUser].photo = pendingPhoto || null;
+        let newName = document.getElementById('edit-name').value.trim();
+        if(!newName) return showToast("กรอกชื่อ");
+        db.users[currentUser].name = newName;
+        if(window.newEmoji) db.users[currentUser].emoji = window.newEmoji;
         saveAndSync();
-        closeModal("modal-edit-profile");
+        closeModal('modal-edit-profile');
         renderDash();
         renderSelect();
-        showToast("✅ อัปเดตโปรไฟล์แล้ว!");
+        showToast("✅ อัปเดตโปรไฟล์");
       }
-
-      // ── Split ─────────────────────────────────────────────────────
-      function openSplit(fromDash) {
-        splitFromDash = !!fromDash;
-        splitPayer = null;
-        splitPeople = [];
-        document.getElementById("split-total").value = "";
-        document.getElementById("split-note").value = "";
-        document.getElementById("split-preview").style.display = "none";
-        document.getElementById("split-back-btn").onclick = () => {
-          if (splitFromDash) {
-            showScreen("screen-dashboard");
-            renderDash();
-          } else {
-            showScreen("screen-select");
-            renderSelect();
-          }
-        };
-        renderSplitLists();
-        showScreen("screen-split");
-      }
-
-      function renderSplitLists() {
-        const pl = document.getElementById("split-payer-list"),
-          ml = document.getElementById("split-people-list");
-        if (!pl || !ml) return;
-        pl.innerHTML = "";
-        ml.innerHTML = "";
-        Object.values(db.users).forEach((u) => {
-          const pSel = splitPayer === u.id;
-          const pd = document.createElement("div");
-          pd.className = `checkbox-item ${pSel ? "selected" : ""}`;
-          pd.innerHTML = `<div class="checkbox-box">${pSel ? "✓" : ""}</div><div class="checkbox-avatar">${u.emoji}</div><div class="checkbox-name">${u.name}</div>`;
-          pd.onclick = () => {
-            splitPayer = u.id;
-            renderSplitLists();
-            updateSplitPreview();
-          };
-          pl.appendChild(pd);
-
-          const mSel = splitPeople.includes(u.id);
-          const md = document.createElement("div");
-          md.className = `checkbox-item ${mSel ? "selected" : ""}`;
-          md.innerHTML = `<div class="checkbox-box">${mSel ? "✓" : ""}</div><div class="checkbox-avatar">${u.emoji}</div><div class="checkbox-name">${u.name}</div>`;
-          md.onclick = () => {
-            if (splitPeople.includes(u.id))
-              splitPeople = splitPeople.filter((x) => x !== u.id);
-            else splitPeople.push(u.id);
-            renderSplitLists();
-            updateSplitPreview();
-          };
-          ml.appendChild(md);
-        });
-      }
-
-      function updateSplitPreview() {
-        const total = parseFloat(document.getElementById("split-total").value);
-        const prev = document.getElementById("split-preview");
-        if (!total || !splitPayer || !splitPeople.length) {
-          prev.style.display = "none";
-          return;
-        }
-        const perHead = Math.ceil(total / splitPeople.length);
-        let html = `บิล ${fmt(total)} ÷ ${splitPeople.length} คน = คนละ <b style="color:var(--yellow);">${fmt(perHead)}</b><br><br>`;
-        splitPeople
-          .filter((p) => p !== splitPayer)
-          .forEach((p) => {
-            html += `${db.users[p].emoji} ${db.users[p].name} → เป็นหนี้ ${db.users[splitPayer].emoji} ${db.users[splitPayer].name} +${fmt(perHead)}<br>`;
-          });
-        if (splitPeople.includes(splitPayer))
-          html += `<span style="color:var(--green);">✓ ${db.users[splitPayer].name} ออกเงินแล้ว ไม่ต้องจ่ายเพิ่ม</span>`;
-        document.getElementById("split-preview-content").innerHTML = html;
-        prev.style.display = "block";
-      }
-
-      function confirmSplit() {
-        const total = parseFloat(document.getElementById("split-total").value);
-        const note = document.getElementById("split-note").value || "หารบิล";
-        if (!total || total <= 0) {
-          showToast("⚠️ ใส่ยอดบิล");
-          return;
-        }
-        if (!splitPayer) {
-          showToast("⚠️ เลือกคนจ่าย");
-          return;
-        }
-        if (!splitPeople.length) {
-          showToast("⚠️ เลือกคนร่วมหาร");
-          return;
-        }
-        const perHead = Math.ceil(total / splitPeople.length);
-        const ts = Date.now();
-        splitPeople
-          .filter((p) => p !== splitPayer)
-          .forEach((p) => {
-            addDebtRaw(p, splitPayer, perHead);
-            db.history.push({
-              id: newId(),
-              from: p,
-              to: splitPayer,
-              type: "split",
-              amount: perHead,
-              note,
-              ts,
-            });
-          });
-        saveAndSync();
-        showToast(`✅ หารเรียบร้อย! คนละ ${fmt(perHead)}`);
-        if (splitFromDash) {
-          showScreen("screen-dashboard");
-          renderDash();
-        } else {
-          showScreen("screen-select");
-          renderSelect();
-        }
-      }
-
-      // ── Modal Utils ───────────────────────────────────────────────
-      function openModal(id) {
-        document.getElementById(id).classList.add("open");
-      }
-      function closeModal(id) {
-        document.getElementById(id).classList.remove("open");
-      }
-      document.querySelectorAll(".modal-overlay").forEach((ov) => {
-        ov.addEventListener("click", (e) => {
-          if (e.target === ov) ov.classList.remove("open");
-        });
-      });
-
-      // ── Setup: User Management ───────────────────────────────────
-      const USER_COLORS = [
-        "#c83dff",
-        "#00c6ff",
-        "#5aff8a",
-        "#6ad3ff",
-        "#ffd060",
-        "#ff5a7a",
-        "#ff914d",
-        "#a8ff78",
-        "#7c6aff",
-        "#ff6a9e",
-        "#00e5cc",
-        "#f9ca24",
-      ];
-      let newUserEmoji = "😎";
-      let newUserColor = "#7c6aff";
-      let delUserId = null;
-      let logFilter = "all";
-
-      function renderSetupScreen() {
-        renderSetupUserList();
-        renderActivityLog();
-        const cfgInput = document.getElementById("setup-firebase-config");
-        if (cfgInput && firebaseConfig) cfgInput.value = JSON.stringify(firebaseConfig, null, 2);
-        const rkInput = document.getElementById("setup-room-key");
-        if (rkInput) rkInput.value = roomKey || "house66";
-      }
-
-      function renderSetupUserList() {
-        const list = document.getElementById("setup-user-list");
-        if (!list) return;
-        list.innerHTML = "";
-        Object.values(db.users).forEach((u) => {
-          const owe = Object.values(db.debts[u.id] || {}).reduce(
-            (a, b) => a + b,
-            0,
-          );
-          const owed = Object.keys(db.users)
-            .filter((k) => k !== u.id)
-            .reduce((a, k) => a + getDebt(k, u.id), 0);
-          const row = document.createElement("div");
-          row.className = "user-manage-row";
-          const manAvHTML = u.photo
-            ? `<img src="${u.photo}" style="width:36px;height:36px;object-fit:cover;border-radius:50%;" alt="${u.name}">`
-            : u.emoji;
-          row.innerHTML = `
-      <div class="user-manage-avatar" style="overflow:hidden;">${manAvHTML}</div>
-      <div class="user-manage-info">
-        <div class="user-manage-name">${u.name}</div>
-        <div class="user-manage-sub">หนี้: ${fmt(owe)} | ลูกหนี้: ${fmt(owed)}</div>
-      </div>
-      <button class="user-manage-del" onclick="openDelUserModal('${u.id}')">🗑️ ลบ</button>`;
-          list.appendChild(row);
-        });
-      }
-
-      function openAddUserModal() {
-        newUserEmoji = "😎";
-        newUserColor = "#7c6aff";
-        newUserPendingPhoto = null;
-        document.getElementById("new-user-name").value = "";
-        document.getElementById("new-user-file-input").value = "";
-        const wrap = document.getElementById("new-user-photo-preview-wrap");
-        if (wrap)
-          wrap.innerHTML = `<div style="font-size:2.5rem;margin-bottom:6px;">📷</div>
-    <div class="upload-label" style="font-size:.78rem;">แตะเพื่อเลือกรูป (ไม่บังคับ)</div>`;
-
-        // emoji grid
-        const eg = document.getElementById("new-user-emoji-grid");
-        eg.innerHTML = "";
-        EMOJIS.forEach((em) => {
-          const d = document.createElement("div");
-          d.className = `emoji-opt ${em === newUserEmoji ? "selected" : ""}`;
-          d.textContent = em;
-          d.onclick = () => {
-            newUserEmoji = em;
-            eg.querySelectorAll(".emoji-opt").forEach((x) =>
-              x.classList.remove("selected"),
-            );
-            d.classList.add("selected");
-          };
-          eg.appendChild(d);
-        });
-
-        // color grid
-        const cg = document.getElementById("new-user-color-grid");
-        cg.innerHTML = "";
-        USER_COLORS.forEach((col) => {
-          const d = document.createElement("div");
-          d.className = `color-dot ${col === newUserColor ? "selected" : ""}`;
-          d.style.background = col;
-          d.onclick = () => {
-            newUserColor = col;
-            cg.querySelectorAll(".color-dot").forEach((x) =>
-              x.classList.remove("selected"),
-            );
-            d.classList.add("selected");
-          };
-          cg.appendChild(d);
-        });
-        openModal("modal-add-user");
-      }
-
-      async function handleNewUserPhoto(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        try {
-          newUserPendingPhoto = await compressImage(file, 300, 0.75);
-          const wrap = document.getElementById("new-user-photo-preview-wrap");
-          if (wrap)
-            wrap.innerHTML = `<img src="${newUserPendingPhoto}" class="upload-preview" alt="preview">
-      <div class="upload-label" style="font-size:.75rem;">แตะเพื่อเปลี่ยนรูป</div>`;
-          showToast("📷 เลือกรูปแล้ว");
-        } catch (err) {
-          showToast("⚠️ โหลดรูปไม่ได้");
-        }
-      }
-
-      function confirmAddUser() {
-        const name = document.getElementById("new-user-name").value.trim();
-        if (!name) {
-          showToast("⚠️ ใส่ชื่อด้วย");
-          return;
-        }
-        // generate id from name (slugify)
-        let id =
-          name
-            .toLowerCase()
-            .replace(/[^a-z0-9ก-๙]/g, "")
-            .substring(0, 12) || "user" + Date.now();
-        if (db.users[id]) id = id + Date.now(); // dedupe
-        db.users[id] = {
-          id,
-          name,
-          emoji: newUserEmoji,
-          color: newUserColor,
-          photo: newUserPendingPhoto || null,
-        };
-        db.debts[id] = {};
-        // log
-        db.history.push({
-          id: newId(),
-          type: "user-add",
-          userId: id,
-          note: `เพิ่มผู้ใช้ "${name}"`,
-          ts: Date.now(),
-        });
-        saveAndSync();
-        closeModal("modal-add-user");
-        renderSetupUserList();
-        renderActivityLog();
-        renderSelect();
-        showToast(`✅ เพิ่ม ${name} แล้ว!`);
-      }
-
-      function openDelUserModal(uid) {
-        delUserId = uid;
-        const u = db.users[uid];
-        const owe = Object.values(db.debts[uid] || {}).reduce(
-          (a, b) => a + b,
-          0,
-        );
-        const owed = Object.keys(db.users)
-          .filter((k) => k !== uid)
-          .reduce((a, k) => a + getDebt(k, uid), 0);
-        document.getElementById("del-user-info").innerHTML =
-          `<b>${u.emoji} ${u.name}</b><br>มีหนี้ค้างอยู่: ${fmt(owe)} · มีลูกหนี้: ${fmt(owed)}`;
-        openModal("modal-del-user");
-      }
-
-      function confirmDelUser() {
-        if (!delUserId) return;
-        const u = db.users[delUserId];
-        // log before delete
-        db.history.push({
-          id: newId(),
-          type: "user-del",
-          userId: delUserId,
-          note: `ลบผู้ใช้ "${u.name}"`,
-          ts: Date.now(),
-        });
-        // remove from users
-        delete db.users[delUserId];
-        // remove their debts
-        delete db.debts[delUserId];
-        // remove debts pointing to them
-        Object.keys(db.debts).forEach((k) => {
-          if (db.debts[k]) delete db.debts[k][delUserId];
-        });
-        // remove history entries for them (optional: keep for audit)
-        // keep history — just orphaned entries will still show in log
-        saveAndSync();
-        closeModal("modal-del-user");
-        renderSetupUserList();
-        renderActivityLog();
-        renderSelect();
-        showToast(`🗑️ ลบ ${u.name} แล้ว`);
-        delUserId = null;
-      }
-
-      // ── Activity Log ──────────────────────────────────────────────
       function renderActivityLog() {
-        const list = document.getElementById("activity-log-list");
-        if (!list) return;
-        list.innerHTML = "";
-        const all = [...db.history].sort((a, b) => b.ts - a.ts);
-        const filtered =
-          logFilter === "all" ? all : all.filter((h) => h.type === logFilter);
-        if (!filtered.length) {
-          list.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:16px;font-size:.85rem;">ไม่มีรายการ</div>`;
-          return;
-        }
-        filtered.slice(0, 60).forEach((h) => {
-          const d = document.createElement("div");
-          d.className = "log-item";
-          let icon = "📝",
-            iconCls = "add",
-            amtHtml = "",
-            noteHtml = "";
-          const fU = db.users[h.from] || { name: h.from || "?", emoji: "👤" };
-          const tU = db.users[h.to] || { name: h.to || "?", emoji: "👤" };
-          if (h.type === "pay") {
-            icon = "💸";
-            iconCls = "pay";
-            noteHtml = `${fU.emoji} <b>${fU.name}</b> จ่ายหนี้ ${tU.emoji} <b>${tU.name}</b>${h.note ? " · " + h.note : ""}${h.method ? " (" + (h.method === "transfer" ? "อัพสลีฟ" : "เงินสด") + ")" : ""}`;
-            amtHtml = `<div class="log-amount pay">-${fmt(h.amount)}</div>`;
-          } else if (h.type === "add") {
-            icon = "➕";
-            iconCls = "add";
-            noteHtml = `${fU.emoji} <b>${fU.name}</b> เป็นหนี้เพิ่ม ${tU.emoji} <b>${tU.name}</b>${h.note ? " · " + h.note : ""}`;
-            amtHtml = `<div class="log-amount add">+${fmt(h.amount)}</div>`;
-          } else if (h.type === "split") {
-            icon = "🍻";
-            iconCls = "split";
-            noteHtml = `${fU.emoji} <b>${fU.name}</b> หารบิลกับ ${tU.emoji} <b>${tU.name}</b>${h.note ? " · " + h.note : ""}`;
-            amtHtml = `<div class="log-amount add">+${fmt(h.amount)}</div>`;
-          } else if (h.type === "user-add") {
-            icon = "👤";
-            iconCls = "user-add";
-            noteHtml = `<b>${h.note || "เพิ่มผู้ใช้"}</b>`;
-            amtHtml = `<div class="log-amount neutral">👋</div>`;
-          } else if (h.type === "user-del") {
-            icon = "🗑️";
-            iconCls = "user-del";
-            noteHtml = `<b>${h.note || "ลบผู้ใช้"}</b>`;
-            amtHtml = `<div class="log-amount neutral">❌</div>`;
-          }
-          d.innerHTML = `
-      <div class="log-icon ${iconCls}">${icon}</div>
-      <div class="log-info">
-        <div class="log-note">${noteHtml}</div>
-        <div class="log-date">${thaiDate(h.ts)}</div>
-      </div>
-      ${amtHtml}`;
-          list.appendChild(d);
+        let listDiv = document.getElementById('activity-log-list');
+        listDiv.innerHTML = '';
+        let logs = [...db.history].sort((a,b)=>b.ts - a.ts).filter(h=> logFilter==='all' ? true : h.type===logFilter);
+        if(logs.length===0) { listDiv.innerHTML = '<div style="text-align:center; opacity:0.5;">ไม่มีประวัติ</div>'; return; }
+        logs.slice(0,50).forEach(h=>{
+          let txt = '';
+          if(h.type==='pay') txt = `💸 จ่ายหนี้ ${fmt(h.amount)} (${db.users[h.from]?.name} → ${db.users[h.to]?.name})`;
+          else if(h.type==='add') txt = `➕ เพิ่มหนี้ ${fmt(h.amount)} (${db.users[h.from]?.name} → ${db.users[h.to]?.name})`;
+          else if(h.type==='split') txt = `🍻 หารบิล ${fmt(h.amount)} (${db.users[h.from]?.name} → ${db.users[h.to]?.name})`;
+          else if(h.type==='user-add') txt = `👤 ${h.note}`;
+          else if(h.type==='user-del') txt = `🗑️ ${h.note}`;
+          listDiv.innerHTML += `<div class="debt-item" style="padding:10px;"><div>${txt}</div><div style="font-size:0.7rem;">${thaiDate(h.ts)}</div></div>`;
         });
-        if (filtered.length > 60) {
-          list.insertAdjacentHTML(
-            "beforeend",
-            `<div style="text-align:center;color:var(--text-muted);padding:12px;font-size:.78rem;">แสดง 60 รายการล่าสุด (ทั้งหมด ${filtered.length})</div>`,
-          );
-        }
       }
+      function filterLog(type) { logFilter = type; renderActivityLog(); }
 
-      function filterLog(type) {
-        logFilter = type;
-        ["all", "pay", "add", "split"].forEach((t) => {
-          const btn = document.getElementById("log-filter-" + t);
-          if (btn) btn.classList.toggle("active", t === type);
-        });
-        renderActivityLog();
-      }
+      // ---------- MODAL HELPERS ----------
+      function openModal(id) { document.getElementById(id).classList.add('open'); }
+      function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+      window.onclick = (e) => { if(e.target.classList && e.target.classList.contains('modal-overlay')) e.target.classList.remove('open'); };
 
-      // ── Init ──────────────────────────────────────────────────────
+      // ---------- INIT ----------
       loadLocal();
-      renderSelect();
-      showScreen("screen-select");
-      if (firebaseConfig) {
-        initFirebase(firebaseConfig, roomKey);
-      } else {
-        setSyncUI("off", "ไม่ได้เชื่อมต่อ", false);
+      let savedConfig = localStorage.getItem('fb_config');
+      let savedRoom = localStorage.getItem('fb_room');
+      if(savedConfig) {
+        try { initFirebase(JSON.parse(savedConfig), savedRoom || 'house66'); }
+        catch(e) {}
       }
+      showScreen('screen-select');
     </script>
   </body>
 </html>
